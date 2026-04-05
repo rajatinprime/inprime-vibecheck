@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>InPrime Finserv · 360° Feedback</title>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/recharts@2.12.7/umd/Recharts.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body { background: #060f0e; color: #fff; font-family: "Nunito Sans", system-ui, sans-serif; -webkit-tap-highlight-color: transparent; overscroll-behavior: none; }
+    textarea, input { font-family: inherit; }
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: #0d1e1c; }
+    ::-webkit-scrollbar-thumb { background: #1a3530; border-radius: 2px; }
+    #root { min-height: 100vh; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- No backend setup required — data stored locally, shared via codes -->
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+    const { RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer } = Recharts;
+
+    // ─── Mobile hook ─────────────────────────────────────────
+    function useMobile() {
+      const [mobile, setMobile] = useState(window.innerWidth < 600);
+      useEffect(() => {
+        const fn = () => setMobile(window.innerWidth < 600);
+        window.addEventListener("resize", fn);
+        return () => window.removeEventListener("resize", fn);
+      }, []);
+      return mobile;
+    }
+
+    // ─── Brand ───────────────────────────────────────────────
+    const TEAL = "#009E8C";
+
+    function InPrimeLogo() {
+      return (
+        <div style={{ background:"#fff", borderRadius:10, padding:"5px 10px", display:"inline-flex", alignItems:"center", justifyContent:"center" }}>
+          <img src="data:image/png;base64,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" alt="InPrime Finserv" style={{ height:46, width:"auto", display:"block" }} />
+        </div>
+      );
+    }
+
+    // ─── Team ────────────────────────────────────────────────
+    const TEAM = [
+      { id:4,  name:"Dhruman Jani",         role:"Founding Member · Credit Analytics",  avatar:"DJ", color:"#F9A825" },
+      { id:5,  name:"Siddharth Jagani",     role:"Founding Member · Product & Growth",  avatar:"SJ", color:"#FF7043" },
+      { id:6,  name:"Harsha Vardhan",       role:"VP of Engineering",                   avatar:"HV", color:"#7C4DFF" },
+      { id:7,  name:"Chandrasekhar A",      role:"Founding Member · Business",          avatar:"CA", color:"#00BCD4" },
+      { id:8,  name:"Abhijit Korti",        role:"Founding Member · Digital & Product", avatar:"AK", color:"#EE5A24" },
+      { id:9,  name:"Soham Bhattacharya",   role:"Founding Team · Finance",             avatar:"SB", color:"#26A69A" },
+      { id:10, name:"Rohit Parashar",       role:"Founding Member · Operations",        avatar:"RP", color:"#EF5350" },
+      { id:11, name:"Shrungeshwara C N",    role:"Core Team",                           avatar:"SC", color:"#5C6BC0" },
+      { id:12, name:"Jagrithi K",           role:"Core Team",                           avatar:"JK", color:"#EC407A" },
+    ];
+
+    // ─── Parameters ──────────────────────────────────────────
+    const PARAMS = [
+      { key:"missionAlignment", label:"Mission Alignment", icon:"🌟", short:"Company-first over function-first",
+        detail:"Not just 'do they believe in the mission,' but do their decisions reflect InPrime's actual model: serving the emerging middle class, staying customer-centric, keeping risk objective, and building DigiCal rather than siloed functions. The strongest signal is whether, in moments of trade-off, the person chooses what is right for InPrime's customers and model — even when it is inconvenient for their own function." },
+      { key:"ownership", label:"Ownership", icon:"🎯", short:"Spots gaps, starts before being told",
+        detail:"For a core team, passive competence is not enough. This assesses whether the person spots what needs to be done, starts before being told, and takes responsibility beyond their formal role. At InPrime, founding and senior members are expected to build, not just manage. Look for whether the person steps in when something is slipping even if it is not 'their job,' and whether they take accountability when things go wrong rather than deflecting." },
+      { key:"execution", label:"Execution Quality", icon:"⚡", short:"Translates strategy into outcomes",
+        detail:"Tests whether the leader can translate strategy into plans, plans into an operating rhythm, and rhythm into outcomes. In a lending company with both field and digital layers, execution quality is one of the clearest differentiators. Strong executors ship reliably, manage dependencies proactively, and deliver without needing to be chased." },
+      { key:"reliability", label:"Reliability", icon:"🔒", short:"Others can count on this person",
+        detail:"In senior teams, brilliance without dependability creates organisational drag. Can others count on this person? Do they show up predictably? Do they follow through in good times and bad? Reliability also means communicating proactively when something will slip — so surprises are rare and the team can adapt." },
+      { key:"judgment", label:"Judgment Under Uncertainty", icon:"🧭", short:"Sound calls with incomplete information",
+        detail:"Tests whether the person can make sound calls with incomplete information, balance speed with prudence, and avoid either paralysis or reckless action. Especially important for InPrime because the model combines data, field assessment, risk, and evolving customer behaviour. The best leaders here are neither over-cautious nor impulsive — they know when to act and when to pause." },
+      { key:"problemSolving", label:"Problem Solving & Learning", icon:"💡", short:"Solves first principles, grows each cycle",
+        detail:"The best core team members do not just solve the current issue — they get better after each cycle. Combines problem-solving with learning agility because InPrime's leadership spans credit, technology, product, finance, and HR. Look for whether they diagnose before prescribing, and whether they apply lessons from failures constructively." },
+      { key:"collaboration", label:"Cross-functional Collaboration", icon:"🤝", short:"Helps the institution win, not just their team",
+        detail:"InPrime's model requires synchrony across field, underwriting, product, engineering, finance, and HR. This tests whether the person helps the institution win, not just their function. Strong collaborators create clarity at the intersection of teams, resolve conflict quickly, and make it easy for other functions to do their best work." },
+      { key:"communication", label:"Communication & Clarity", icon:"💬", short:"Creates alignment, not just information",
+        detail:"Not 'speaks well,' but whether the person creates clarity. Can they align people, simplify complexity, escalate clearly, disagree constructively, and communicate trade-offs honestly? With a cross-functional founding team, this dimension is critical. The real test is whether their messages land the same way with a field officer and a board member." },
+      { key:"teamBuilding", label:"Team Building & Culture", icon:"🌱", short:"Creates leaders, raises standards around them",
+        detail:"Senior leaders should build teams, raise standards, coach others, and strengthen culture. The long-term institutional question is whether each core member is creating more leaders and better habits around them. Look for whether the people around this person grow — and whether they leave processes and standards stronger than they found them." },
+      { key:"customerRisk", label:"Customer–Risk Balance", icon:"⚖️", short:"Grows business without compromising underwriting",
+        detail:"For InPrime, the stronger test is whether leaders can balance customer-centricity and risk discipline together — not as competing ideas. A core team 360 should assess whether a leader can grow the business without compromising underwriting quality, transparency, or customer trust. The best leaders find ways to say yes to more customers while keeping the book clean." },
+    ];
+
+    const PARAM_KEYS = PARAMS.map(p => p.key);
+
+    // ─── Local Storage ────────────────────────────────────────
+    // Data shape: { feedback: { "reviewerId:revieweeId": { scores, strengthText, growthText, submittedAt } } }
+    const DB_KEY = "inprime_360_v1";
+
+    async function dbRead() {
+      try {
+        const raw = localStorage.getItem(DB_KEY);
+        return raw ? JSON.parse(raw) : { feedback: {} };
+      } catch(e) { return { feedback: {} }; }
+    }
+
+    async function dbWrite(data) {
+      localStorage.setItem(DB_KEY, JSON.stringify(data));
+    }
+
+    // ─── Submission Codes ─────────────────────────────────────
+    function encodeCode(reviewerId, revieweeId, scores, strengthText, growthText) {
+      const obj = { r: reviewerId, e: revieweeId, s: scores, st: strengthText || "", gt: growthText || "", t: new Date().toISOString() };
+      return btoa(unescape(encodeURIComponent(JSON.stringify(obj))));
+    }
+
+    function decodeCode(code) {
+      try { return JSON.parse(decodeURIComponent(escape(atob(code.trim())))); }
+      catch(e) { return null; }
+    }
+
+    async function importCodes(rawText) {
+      const lines = rawText.split(/[\n,]+/).map(l => l.trim()).filter(Boolean);
+      let ok = 0, fail = 0;
+      const data = await dbRead();
+      for (const line of lines) {
+        const sub = decodeCode(line);
+        if (!sub || !sub.r || !sub.e || !sub.s) { fail++; continue; }
+        data.feedback[`${sub.r}:${sub.e}`] = { scores: sub.s, strengthText: sub.st, growthText: sub.gt, submittedAt: sub.t };
+        ok++;
+      }
+      await dbWrite(data);
+      return { ok, fail };
+    }
+
+    async function saveFeedback(reviewerId, revieweeId, scores, strengthText, growthText) {
+      try {
+        const data = await dbRead();
+        data.feedback[`${reviewerId}:${revieweeId}`] = { scores, strengthText, growthText, submittedAt: new Date().toISOString() };
+        await dbWrite(data);
+        return true;
+      } catch(e) { console.error("Save failed", e); return false; }
+    }
+
+    async function loadAllFeedbackForPerson(personId) {
+      const data = await dbRead();
+      const fb = data.feedback || {};
+      let selfData = null;
+      const peerSubmissions = [];
+      for (const [key, val] of Object.entries(fb)) {
+        const parts = key.split(":");
+        const reviewerId = Number(parts[0]);
+        const revieweeId = Number(parts[1]);
+        if (revieweeId !== personId) continue;
+        if (reviewerId === personId) { selfData = val; }
+        else { peerSubmissions.push(val); }
+      }
+      return { selfData, peerSubmissions };
+    }
+
+    async function loadExistingSubmission(reviewerId, revieweeId) {
+      const data = await dbRead();
+      return data.feedback?.[`${reviewerId}:${revieweeId}`] || null;
+    }
+
+    // ─── Helpers ─────────────────────────────────────────────
+    function computePeerAvg(subs) {
+      if (!subs.length) return null;
+      const totals = {}; PARAM_KEYS.forEach(k => { totals[k] = 0; });
+      subs.forEach(s => { PARAM_KEYS.forEach(k => { totals[k] += (s.scores?.[k] || 0); }); });
+      const r = {}; PARAM_KEYS.forEach(k => { r[k] = +(totals[k] / subs.length).toFixed(1); });
+      return r;
+    }
+    function avgObj(o) {
+      const vals = Object.values(o).filter(v => v > 0);
+      if (!vals.length) return 0;
+      return +(vals.reduce((a,b) => a+b, 0) / vals.length).toFixed(1);
+    }
+    function emptyScores() { const o = {}; PARAM_KEYS.forEach(k => { o[k] = 0; }); return o; }
+
+    // ─── Star Rating ─────────────────────────────────────────
+    function StarRating({ value, onChange }) {
+      const [hover, setHover] = useState(0);
+      const labels = ["","Needs significant improvement","Below expectations","Meets expectations","Above expectations","Exceptional"];
+      return (
+        <div style={{ display:"flex", alignItems:"center", gap:2, flexWrap:"wrap" }}>
+          {[1,2,3,4,5].map(n => (
+            <button key={n} onMouseEnter={()=>setHover(n)} onMouseLeave={()=>setHover(0)} onClick={()=>onChange(n)}
+              style={{ background:"none", border:"none", cursor:"pointer", padding:"6px 4px", fontSize:32, lineHeight:1, minWidth:44, minHeight:44,
+                display:"flex", alignItems:"center", justifyContent:"center",
+                color: n<=(hover||value) ? "#F9A825" : "#1a2e2a",
+                transform: n<=(hover||value) ? "scale(1.1)" : "scale(1)", transition:"all 0.1s" }}>★</button>
+          ))}
+          {(hover||value) > 0 && <div style={{ fontSize:11, color:"#888", marginTop:4, width:"100%" }}>{labels[hover||value]}</div>}
+        </div>
+      );
+    }
+
+    // ─── Feedback Form ────────────────────────────────────────
+    function FeedbackForm({ onBack }) {
+      const [step, setStep]             = useState(1);
+      const [reviewerId, setReviewerId] = useState(null);
+      const [revieweeId, setRevieweeId] = useState(null);
+      const [scores, setScores]         = useState(emptyScores());
+      const [strengthText, setStrengthText] = useState("");
+      const [growthText, setGrowthText]     = useState("");
+      const [saving, setSaving]         = useState(false);
+      const [myCode, setMyCode]         = useState("");
+      const [copied, setCopied]         = useState(false);
+      const m = useMobile();
+      const reviewer = TEAM.find(p => p.id === reviewerId);
+      const reviewee = TEAM.find(p => p.id === revieweeId);
+      const isSelf   = reviewerId === revieweeId;
+      const allScored = PARAM_KEYS.every(k => scores[k] > 0);
+      const scoredCount = PARAM_KEYS.filter(k => scores[k] > 0).length;
+      const progressPct = step===1?8:step===2?22:step===3?(22+(scoredCount/PARAM_KEYS.length)*50):step===4?82:100;
+
+      useEffect(() => {
+        if (!reviewerId || !revieweeId) return;
+        loadExistingSubmission(reviewerId, revieweeId).then(ex => {
+          if (ex) { setScores(ex.scores || emptyScores()); setStrengthText(ex.strengthText||""); setGrowthText(ex.growthText||""); }
+          else { setScores(emptyScores()); setStrengthText(""); setGrowthText(""); }
+        });
+      }, [reviewerId, revieweeId]);
+
+      async function handleSubmit() {
+        setSaving(true);
+        const code = encodeCode(reviewerId, revieweeId, scores, strengthText, growthText);
+        const ok = await saveFeedback(reviewerId, revieweeId, scores, strengthText, growthText);
+        setSaving(false);
+        if (ok) { setMyCode(code); setStep(5); }
+      }
+
+      return (
+        <div style={{ maxWidth:680, margin:"0 auto", padding: m ? "0 0 80px" : "0 16px 60px" }}>
+          <button onClick={onBack} style={{ background:"none", border:"1px solid #1a3530", color:"#666", borderRadius:10, padding:"10px 16px", cursor:"pointer", fontSize:14, marginBottom:18, display:"flex", alignItems:"center", gap:6, minHeight:44 }}>← Back</button>
+
+          {step < 5 && (
+            <div style={{ marginBottom:22 }}>
+              <div style={{ display:"flex", justifyContent:"space-between", marginBottom:6 }}>
+                <span style={{ fontSize:12, color:TEAL, fontWeight:700 }}>
+                  {step===1?"Step 1 of 4 — Who are you?":step===2?"Step 2 of 4 — Who are you reviewing?":step===3?"Step 3 of 4 — Rate each dimension":"Step 4 of 4 — Written feedback"}
+                </span>
+                <span style={{ fontSize:11, color:"#2a4a44" }}>{Math.round(progressPct)}%</span>
+              </div>
+              <div style={{ background:"#0d1e1c", borderRadius:4, height:5, overflow:"hidden" }}>
+                <div style={{ width:`${progressPct}%`, height:"100%", background:`linear-gradient(90deg,${TEAL},#54A0FF)`, borderRadius:4, transition:"width 0.4s" }}/>
+              </div>
+            </div>
+          )}
+
+          {step === 1 && (
+            <div style={{ background:"#0d1e1c", border:"1px solid #0f2520", borderRadius:20, padding:24 }}>
+              <h2 style={{ margin:"0 0 5px", fontSize:19, fontWeight:800, color:"#fff" }}>Give 360° Feedback</h2>
+              <p style={{ color:"#3a5a54", fontSize:13, margin:"0 0 18px", lineHeight:1.6 }}>First, tell us who you are. This routes your feedback as <strong style={{color:"#fff"}}>self-rating</strong> or <strong style={{color:"#fff"}}>peer feedback</strong>.</p>
+              <div style={{ background:"#0a1714", border:`1px solid ${TEAL}28`, borderRadius:12, padding:"10px 14px", marginBottom:18, fontSize:13, color:TEAL, display:"flex", gap:8 }}>
+                🔒 <span>Peer feedback is always <strong>fully anonymous</strong>. Only self-ratings are linked to your name.</span>
+              </div>
+              <label style={{ fontSize:13, fontWeight:700, color:"#aaa", display:"block", marginBottom:10 }}>Select your name</label>
+              <div style={{ display:"grid", gridTemplateColumns:`repeat(auto-fill,minmax(${m?145:195}px,1fr))`, gap:8 }}>
+                {TEAM.map(p => (
+                  <div key={p.id} onClick={()=>setReviewerId(p.id)}
+                    style={{ border:`2px solid ${reviewerId===p.id?p.color:"#1a2e2a"}`, background:reviewerId===p.id?p.color+"14":"#0a1714", borderRadius:12, padding:"10px 13px", cursor:"pointer", display:"flex", alignItems:"center", gap:9, minHeight:44, transition:"all 0.15s" }}>
+                    <div style={{ width:32, height:32, borderRadius:"50%", background:`linear-gradient(135deg,${p.color}88,${p.color}33)`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:800, color:p.color, flexShrink:0 }}>{p.avatar}</div>
+                    <div style={{ minWidth:0 }}>
+                      <div style={{ fontSize:12, fontWeight:700, color:"#fff", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{p.name}</div>
+                      <div style={{ fontSize:10, color:"#3a5a54", marginTop:1 }}>{p.role.split("·")[0].trim()}</div>
+                    </div>
+                    {reviewerId===p.id && <span style={{ color:TEAL, fontSize:14, marginLeft:"auto", flexShrink:0 }}>✓</span>}
+                  </div>
+                ))}
+              </div>
+              <button onClick={()=>setStep(2)} disabled={!reviewerId}
+                style={{ width:"100%", marginTop:20, padding:"16px", background:reviewerId?TEAL:"#0f1e1c", border:"none", borderRadius:12, color:reviewerId?"#fff":"#2a4040", fontSize:16, fontWeight:700, cursor:reviewerId?"pointer":"not-allowed" }}>
+                Continue →
+              </button>
+            </div>
+          )}
+
+          {step === 2 && reviewer && (
+            <div style={{ background:"#0d1e1c", border:"1px solid #0f2520", borderRadius:20, padding:24 }}>
+              <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:16 }}>
+                <div style={{ width:36, height:36, borderRadius:"50%", background:`linear-gradient(135deg,${reviewer.color},${reviewer.color}55)`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:12, fontWeight:800, color:"#fff", flexShrink:0 }}>{reviewer.avatar}</div>
+                <div>
+                  <div style={{ fontSize:15, fontWeight:800, color:"#fff" }}>Hi, {reviewer.name.split(" ")[0]} 👋</div>
+                  <div style={{ fontSize:12, color:"#3a5a54" }}>Who would you like to review?</div>
+                </div>
+              </div>
+              <div style={{ background:"#0a1714", border:"1px solid #1a3530", borderRadius:12, padding:"10px 14px", marginBottom:16, fontSize:12 }}>
+                <span style={{ color:TEAL }}>📝 <strong>Yourself</strong> = self-rating &nbsp;·&nbsp; </span>
+                <span style={{ color:"#54A0FF" }}>🔵 <strong>Someone else</strong> = anonymous peer feedback</span>
+              </div>
+              <div style={{ display:"grid", gridTemplateColumns:`repeat(auto-fill,minmax(${m?145:195}px,1fr))`, gap:8 }}>
+                {TEAM.map(p => {
+                  const isSelfOption = p.id === reviewerId;
+                  return (
+                    <div key={p.id} onClick={()=>setRevieweeId(p.id)}
+                      style={{ border:`2px solid ${revieweeId===p.id?p.color:isSelfOption?"#1a4040":"#1a2e2a"}`, background:revieweeId===p.id?p.color+"14":isSelfOption?"#0a1f1f":"#0a1714", borderRadius:12, padding:"10px 13px", cursor:"pointer", display:"flex", alignItems:"center", gap:9, minHeight:44, transition:"all 0.15s" }}>
+                      <div style={{ width:32, height:32, borderRadius:"50%", background:`linear-gradient(135deg,${p.color}88,${p.color}33)`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:800, color:p.color, flexShrink:0 }}>{p.avatar}</div>
+                      <div style={{ minWidth:0, flex:1 }}>
+                        <div style={{ fontSize:12, fontWeight:700, color:"#fff", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{p.name}{isSelfOption?" (You)":""}</div>
+                        <div style={{ fontSize:10, color:isSelfOption?TEAL:"#3a5a54", marginTop:1 }}>{isSelfOption?"Self-rating":"Peer feedback"}</div>
+                      </div>
+                      {revieweeId===p.id && <span style={{ color:TEAL, fontSize:14, flexShrink:0 }}>✓</span>}
+                    </div>
+                  );
+                })}
+              </div>
+              <button onClick={()=>setStep(3)} disabled={!revieweeId}
+                style={{ width:"100%", marginTop:20, padding:"16px", background:revieweeId?TEAL:"#0f1e1c", border:"none", borderRadius:12, color:revieweeId?"#fff":"#2a4040", fontSize:16, fontWeight:700, cursor:revieweeId?"pointer":"not-allowed" }}>
+                {revieweeId?(isSelf?"Start My Self-Rating →":`Review ${reviewee?.name.split(" ")[0]} →`):"Select someone to continue"}
+              </button>
+            </div>
+          )}
+
+          {step === 3 && reviewee && (
+            <div>
+              <div style={{ background:isSelf?"#0a1f1f":"#0a1420", border:`1px solid ${isSelf?TEAL:"#54A0FF"}33`, borderRadius:14, padding:"13px 16px", marginBottom:16, display:"flex", alignItems:"center", gap:12 }}>
+                <div style={{ width:40, height:40, borderRadius:"50%", background:`linear-gradient(135deg,${reviewee.color},${reviewee.color}55)`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:13, fontWeight:800, color:"#fff", flexShrink:0 }}>{reviewee.avatar}</div>
+                <div>
+                  <div style={{ fontWeight:800, fontSize:15, color:"#fff" }}>{isSelf?"⭐ Self-Rating":`🔵 Peer Feedback for ${reviewee.name}`}</div>
+                  <div style={{ fontSize:12, color:"#3a5a54", marginTop:2 }}>{isSelf?"Be honest — this is private to you.":"Rate each dimension 1–5. Fully anonymous."}</div>
+                </div>
+              </div>
+              <div style={{ display:"flex", flexDirection:"column", gap:9 }}>
+                {PARAMS.map(p => (
+                  <div key={p.key} style={{ background:"#0d1e1c", border:`1px solid ${scores[p.key]>0?"#1a3530":"#0f1e1c"}`, borderRadius:13, padding:"14px 16px" }}>
+                    <div style={{ display:"flex", alignItems:"flex-start", gap:10, marginBottom:9 }}>
+                      <span style={{ fontSize:20, flexShrink:0 }}>{p.icon}</span>
+                      <div style={{ flex:1 }}>
+                        <div style={{ fontWeight:700, fontSize:13, color:"#fff" }}>{p.label}</div>
+                        <div style={{ fontSize:11, color:"#2a5050", marginTop:2 }}>{p.short}</div>
+                      </div>
+                      {scores[p.key]>0 && <span style={{ fontSize:12, color:"#F9A825", fontWeight:700, flexShrink:0 }}>{scores[p.key]}/5</span>}
+                    </div>
+                    <StarRating value={scores[p.key]||0} onChange={v=>setScores(s=>({...s,[p.key]:v}))}/>
+                  </div>
+                ))}
+              </div>
+              <button onClick={()=>setStep(4)} disabled={!allScored}
+                style={{ width:"100%", marginTop:16, padding:"14px", background:allScored?TEAL:"#0f1e1c", border:"none", borderRadius:12, color:allScored?"#fff":"#2a4040", fontSize:15, fontWeight:700, cursor:allScored?"pointer":"not-allowed" }}>
+                {allScored?"Continue to Written Feedback →":`Rate all 10 dimensions (${scoredCount}/10 done)`}
+              </button>
+            </div>
+          )}
+
+          {step === 4 && reviewee && (
+            <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
+              <div style={{ background:"#0d1e1c", border:"1px solid #0f2520", borderRadius:20, padding:22 }}>
+                <h3 style={{ margin:"0 0 5px", fontSize:17, fontWeight:800, color:"#fff" }}>{isSelf?"Your Self-Reflection":`Written Feedback for ${reviewee.name.split(" ")[0]}`}</h3>
+                <p style={{ color:"#3a5a54", fontSize:13, margin:"0 0 18px" }}>Optional but valuable. Be specific. {!isSelf&&"Fully anonymous."}</p>
+                <div style={{ marginBottom:16 }}>
+                  <label style={{ display:"block", fontSize:13, color:"#10AC84", fontWeight:700, marginBottom:8 }}>💪 {isSelf?"What am I most proud of this period?":`What does ${reviewee.name.split(" ")[0]} do really well?`}</label>
+                  <textarea value={strengthText} onChange={e=>setStrengthText(e.target.value)} rows={4}
+                    placeholder={isSelf?"e.g. I'm proud of how I navigated the risk-growth tension in Q2...":"e.g. Consistently brings both the credit lens and the customer lens into the room..."}
+                    style={{ width:"100%", background:"#0a1714", border:"1px solid #10AC8430", borderRadius:12, padding:"12px 14px", color:"#ddd", fontSize:13, lineHeight:1.7, resize:"vertical" }}/>
+                </div>
+                <div>
+                  <label style={{ display:"block", fontSize:13, color:"#FF9F43", fontWeight:700, marginBottom:8 }}>🎯 {isSelf?"Where do I need to grow?":`One area where ${reviewee.name.split(" ")[0]} could grow`}</label>
+                  <textarea value={growthText} onChange={e=>setGrowthText(e.target.value)} rows={4}
+                    placeholder={isSelf?"e.g. I need to delegate more aggressively in H2...":"e.g. Would benefit from bringing the team along earlier on complex calls..."}
+                    style={{ width:"100%", background:"#0a1714", border:"1px solid #FF9F4330", borderRadius:12, padding:"12px 14px", color:"#ddd", fontSize:13, lineHeight:1.7, resize:"vertical" }}/>
+                </div>
+              </div>
+              <div style={{ background:"#0d1e1c", border:"1px solid #0f2520", borderRadius:16, padding:16 }}>
+                <div style={{ fontSize:11, color:"#2a5050", fontWeight:700, textTransform:"uppercase", letterSpacing:0.8, marginBottom:11 }}>Your Scores</div>
+                <div style={{ display:"grid", gridTemplateColumns:"repeat(2,1fr)", gap:6 }}>
+                  {PARAMS.map(p => { const v=scores[p.key]; const c=v>=4?"#10AC84":v>=3?"#F9A825":"#FF6B6B"; return (
+                    <div key={p.key} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", background:"#0a1714", borderRadius:8, padding:"7px 11px" }}>
+                      <span style={{ fontSize:11, color:"#888" }}>{p.icon} {p.label}</span>
+                      <span style={{ fontSize:13, fontWeight:700, color:c, background:c+"18", borderRadius:5, padding:"1px 7px" }}>{v}/5</span>
+                    </div>
+                  ); })}
+                </div>
+              </div>
+              <button onClick={handleSubmit} disabled={saving}
+                style={{ width:"100%", padding:"16px", background:saving?"#0f1e1c":TEAL, border:"none", borderRadius:12, color:"#fff", fontSize:15, fontWeight:700, cursor:saving?"not-allowed":"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:8 }}>
+                {saving?"Saving…":(isSelf?"✓ Save My Self-Rating":"✓ Submit Anonymous Feedback")}
+              </button>
+              {!isSelf && <div style={{ textAlign:"center", fontSize:11, color:"#1a3530" }}>Your name is never stored with this submission</div>}
+            </div>
+          )}
+
+          {step === 5 && (
+            <div style={{ background:"#0d1e1c", border:`1px solid ${TEAL}33`, borderRadius:20, padding:m?24:40, textAlign:"center" }}>
+              <div style={{ fontSize:52, marginBottom:14 }}>{isSelf?"⭐":"✅"}</div>
+              <h2 style={{ color:"#fff", fontSize:21, fontWeight:800, margin:"0 0 10px" }}>{isSelf?"Self-rating saved!":"Feedback submitted!"}</h2>
+              <p style={{ color:"#3a5a54", fontSize:14, lineHeight:1.7, margin:"0 0 16px", maxWidth:380, marginLeft:"auto", marginRight:"auto" }}>
+                {isSelf?`Your self-rating has been saved, ${reviewer?.name.split(" ")[0]}.`:`Your anonymous feedback for ${reviewee?.name} has been recorded.`}
+              </p>
+              {!isSelf && <div style={{ background:"#0a1714", borderRadius:10, padding:"10px 18px", marginBottom:16, fontSize:12, color:"#2a5050", display:"inline-block" }}>🔒 Not linked to your identity</div>}
+
+              <div style={{ background:"#0a1714", border:`1px solid ${TEAL}30`, borderRadius:14, padding:16, marginBottom:20, textAlign:"left" }}>
+                <div style={{ fontSize:12, color:TEAL, fontWeight:700, marginBottom:6 }}>📤 Share your submission code with Rajat</div>
+                <div style={{ fontSize:9, color:"#1a4040", marginBottom:10, lineHeight:1.5 }}>Copy this code and send it via WhatsApp or Slack. Rajat will paste it to see your feedback in the dashboard.</div>
+                <div style={{ fontFamily:"monospace", fontSize:9, color:"#aaa", wordBreak:"break-all", background:"#060f0e", borderRadius:8, padding:"10px 12px", marginBottom:10, lineHeight:1.6, maxHeight:80, overflow:"hidden", textOverflow:"ellipsis" }}>
+                  {myCode.slice(0,120)}…
+                </div>
+                <button onClick={()=>{ navigator.clipboard.writeText(myCode).then(()=>{ setCopied(true); setTimeout(()=>setCopied(false),2500); }); }}
+                  style={{ width:"100%", padding:"10px", background:copied?"#10AC8422":TEAL+"22", border:`1px solid ${copied?"#10AC84":TEAL}55`, borderRadius:9, color:copied?"#10AC84":TEAL, fontSize:13, fontWeight:700, cursor:"pointer" }}>
+                  {copied?"✓ Copied!":"📋 Copy Full Code"}
+                </button>
+              </div>
+
+              <div style={{ display:"flex", gap:10, justifyContent:"center", flexWrap:"wrap" }}>
+                <button onClick={()=>{ setStep(1); setReviewerId(null); setRevieweeId(null); setScores(emptyScores()); setStrengthText(""); setGrowthText(""); setMyCode(""); setCopied(false); }}
+                  style={{ padding:"10px 20px", background:TEAL, border:"none", borderRadius:10, color:"#fff", fontSize:13, fontWeight:700, cursor:"pointer" }}>Review Someone Else</button>
+                <button onClick={onBack} style={{ padding:"10px 20px", background:"#0f1e1c", border:"none", borderRadius:10, color:"#888", fontSize:13, fontWeight:600, cursor:"pointer" }}>View Dashboard</button>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // ─── Gap View ─────────────────────────────────────────────
+    function GapView({ selfScores, peerScores, person }) {
+      const hasSelf=!!selfScores, hasPeers=!!peerScores;
+      if (!hasSelf && !hasPeers) return (
+        <div style={{ background:"#0d1e1c", border:"1px solid #0f2520", borderRadius:20, padding:40, textAlign:"center" }}>
+          <div style={{ fontSize:40, marginBottom:12 }}>📭</div>
+          <div style={{ color:"#3a5a54", fontSize:14 }}>No feedback yet for {person.name.split(" ")[0]}.</div>
+          <div style={{ color:"#2a4040", fontSize:12, marginTop:6 }}>Scores appear once self-rating and peer reviews are submitted.</div>
+        </div>
+      );
+      const rows = PARAMS.map(p => ({
+        ...p, self:hasSelf?(selfScores[p.key]||0):null, peers:hasPeers?(peerScores[p.key]||0):null,
+        gap:(hasSelf&&hasPeers)?+(selfScores[p.key]-peerScores[p.key]).toFixed(1):null
+      })).sort((a,b)=>(Math.abs(b.gap||0)-Math.abs(a.gap||0)));
+      return (
+        <div style={{ background:"#0d1e1c", border:"1px solid #1a3530", borderRadius:20, padding:22 }}>
+          <h3 style={{ color:"#fff", margin:"0 0 4px", fontSize:16, fontWeight:800 }}>🔍 Self vs Peer Perception</h3>
+          <p style={{ color:"#2a5050", fontSize:12, margin:"0 0 14px", lineHeight:1.6 }}>
+            {hasSelf&&hasPeers?"Biggest gaps — your richest signals for growth.":!hasSelf?"Peer scores shown. Add your self-rating to see the comparison.":"Your self-rating shown. Peer scores appear once colleagues submit."}
+          </p>
+          <div style={{ display:"flex", gap:14, marginBottom:12, flexWrap:"wrap" }}>
+            {hasSelf && <span style={{ fontSize:11, color:"#F9A825", fontWeight:600 }}>🟡 Self rating</span>}
+            {hasPeers && <span style={{ fontSize:11, color:"#54A0FF", fontWeight:600 }}>🔵 Peer average ({Math.round(peerScores?._count||0)} reviewer{(peerScores?._count||0)!==1?"s":""})</span>}
+          </div>
+          <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+            {rows.map(p => {
+              const tag=p.gap===null?null:p.gap>0.4?{t:"↑ Self > Peers",c:"#FF9F43"}:p.gap<-0.4?{t:"↑ Peers > Self",c:"#54A0FF"}:{t:"✓ Aligned",c:"#10AC84"};
+              return (
+                <div key={p.key} style={{ background:"#0a1714", borderRadius:12, padding:"13px 15px" }}>
+                  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:9 }}>
+                    <span style={{ fontSize:13, fontWeight:700, color:"#ddd" }}>{p.icon} {p.label}</span>
+                    {tag && <span style={{ fontSize:10, background:tag.c+"20", color:tag.c, border:`1px solid ${tag.c}40`, borderRadius:6, padding:"2px 8px", fontWeight:700 }}>{tag.t}</span>}
+                  </div>
+                  {hasSelf && (
+                    <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:4 }}>
+                      <div style={{ fontSize:10, color:"#F9A825", width:26, textAlign:"right" }}>You</div>
+                      <div style={{ flex:1, background:"#ffffff08", borderRadius:4, height:7, overflow:"hidden" }}><div style={{ width:`${(p.self/5)*100}%`, height:"100%", background:"#F9A825", borderRadius:4 }}/></div>
+                      <div style={{ fontSize:12, fontWeight:700, color:"#F9A825", width:22 }}>{p.self}</div>
+                    </div>
+                  )}
+                  {hasPeers && (
+                    <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                      <div style={{ fontSize:10, color:"#54A0FF", width:26, textAlign:"right" }}>Peers</div>
+                      <div style={{ flex:1, background:"#ffffff08", borderRadius:4, height:7, overflow:"hidden" }}><div style={{ width:`${(p.peers/5)*100}%`, height:"100%", background:"#54A0FF", borderRadius:4 }}/></div>
+                      <div style={{ fontSize:12, fontWeight:700, color:"#54A0FF", width:22 }}>{p.peers}</div>
+                    </div>
+                  )}
+                  {p.gap!==null && Math.abs(p.gap)>0.8 && (
+                    <div style={{ marginTop:8, fontSize:11, color:tag.c, background:tag.c+"10", borderRadius:6, padding:"5px 10px" }}>
+                      {p.gap>0?"💡 Peers may see a different picture here. Worth a conversation.":"💡 You're underselling this — peers consistently rate you higher. Own it."}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      );
+    }
+
+    // ─── Radar View ───────────────────────────────────────────
+    function RadarView({ selfScores, peerScores, person }) {
+      const hasBoth=selfScores&&peerScores, src=selfScores||peerScores;
+      if (!src) return <div style={{ background:"#0d1e1c", border:"1px solid #0f2520", borderRadius:20, padding:40, textAlign:"center" }}><div style={{ color:"#3a5a54", fontSize:14 }}>No data yet — submit feedback to see the radar.</div></div>;
+      const data = PARAMS.map(p => ({ p:p.label.length>13?p.label.slice(0,12)+"…":p.label, ...(selfScores?{Self:selfScores[p.key]||0}:{}), ...(peerScores?{Peers:peerScores[p.key]||0}:{}) }));
+      return (
+        <div style={{ background:"#0d1e1c", border:"1px solid #1a3530", borderRadius:20, padding:22 }}>
+          <h3 style={{ color:"#ddd", margin:"0 0 4px", fontSize:16, fontWeight:700 }}>🕸️ Radar View</h3>
+          <p style={{ color:"#2a5050", fontSize:12, margin:"0 0 14px" }}>{hasBoth?"Overlap shows alignment between self and peer perception.":selfScores?"Your self-rating across all 10 dimensions.":"Peer average across all 10 dimensions."}</p>
+          <ResponsiveContainer width="100%" height={300}>
+            <RadarChart data={data} margin={{top:10,right:34,bottom:10,left:34}}>
+              <PolarGrid stroke="#1a3530"/>
+              <PolarAngleAxis dataKey="p" tick={{fill:"#555",fontSize:11}}/>
+              {selfScores  && <Radar name="Self"  dataKey="Self"  stroke="#F9A825" fill="#F9A825" fillOpacity={0.18} strokeWidth={2.5}/>}
+              {peerScores  && <Radar name="Peers" dataKey="Peers" stroke="#54A0FF" fill="#54A0FF" fillOpacity={0.14} strokeWidth={2}/>}
+            </RadarChart>
+          </ResponsiveContainer>
+          <div style={{ display:"flex", gap:20, justifyContent:"center", marginTop:6, flexWrap:"wrap" }}>
+            {selfScores  && <span style={{ fontSize:12, color:"#F9A825" }}>● Self ({avgObj(selfScores)})</span>}
+            {peerScores  && <span style={{ fontSize:12, color:"#54A0FF" }}>● Peers ({avgObj(peerScores)})</span>}
+          </div>
+        </div>
+      );
+    }
+
+    // ─── Param Info ───────────────────────────────────────────
+    function ParamInfo() {
+      const [open, setOpen] = useState(null);
+      const COLS = [TEAL,"#54A0FF","#4ECDC4","#F9A825","#FF7043","#7C4DFF","#26A69A","#42A5F5","#66BB6A","#EF5350"];
+      return (
+        <div style={{ display:"flex", flexDirection:"column", gap:7 }}>
+          {PARAMS.map((p,i) => { const c=COLS[i], isOpen=open===p.key; return (
+            <div key={p.key} onClick={()=>setOpen(isOpen?null:p.key)}
+              style={{ background:"#0a1714", border:`1px solid ${isOpen?c+"55":"#0f2520"}`, borderRadius:12, padding:"11px 14px", cursor:"pointer" }}>
+              <div style={{ display:"flex", alignItems:"center", gap:9 }}>
+                <div style={{ width:34, height:34, borderRadius:9, background:c+"1a", display:"flex", alignItems:"center", justifyContent:"center", fontSize:17, flexShrink:0 }}>{p.icon}</div>
+                <div style={{ flex:1 }}>
+                  <div style={{ fontWeight:700, fontSize:13, color:isOpen?c:"#ddd" }}>{p.label}</div>
+                  <div style={{ fontSize:11, color:"#2a4a44", marginTop:1 }}>{p.short}</div>
+                </div>
+                <div style={{ color:"#1a3530", fontSize:11, transition:"transform 0.2s", transform:isOpen?"rotate(180deg)":"none" }}>▼</div>
+              </div>
+              {isOpen && <div style={{ marginTop:11, paddingTop:11, borderTop:`1px solid ${c}18`, fontSize:13, color:"#6a8a84", lineHeight:1.85 }}>{p.detail}</div>}
+            </div>
+          ); })}
+        </div>
+      );
+    }
+
+    // ─── Individual Dashboard ─────────────────────────────────
+    function Dashboard({ person, onBack, onGiveFeedback }) {
+      const [tab, setTab]   = useState("gap");
+      const [loading, setLoading] = useState(true);
+      const [selfData, setSelfData]   = useState(null);
+      const [peerData, setPeerData]   = useState(null);
+      const [peerCount, setPeerCount] = useState(0);
+      const [textFeedback, setTextFeedback] = useState({ strengths:[], improvements:[] });
+      const m = useMobile();
+
+      useEffect(() => {
+        setLoading(true);
+        loadAllFeedbackForPerson(person.id).then(({ selfData:sd, peerSubmissions }) => {
+          setSelfData(sd?.scores||null);
+          if (peerSubmissions.length > 0) {
+            const avg = computePeerAvg(peerSubmissions); avg._count = peerSubmissions.length;
+            setPeerData(avg); setPeerCount(peerSubmissions.length);
+            setTextFeedback({ strengths:peerSubmissions.filter(s=>s.strengthText).map(s=>s.strengthText), improvements:peerSubmissions.filter(s=>s.growthText).map(s=>s.growthText) });
+          }
+          setLoading(false);
+        });
+      }, [person.id]);
+
+      const selfAvg=selfData?avgObj(selfData):null, peersAvg=peerData?avgObj(peerData):null;
+      const overall=(selfAvg!==null&&peersAvg!==null)?+((selfAvg+peersAvg)/2).toFixed(1):selfAvg??peersAvg??"—";
+      const gap=(selfAvg!==null&&peersAvg!==null)?+(selfAvg-peersAvg).toFixed(1):null;
+
+      return (
+        <div style={{ maxWidth:860, margin:"0 auto", padding:m?"0 0 80px":"0 16px 60px" }}>
+          <button onClick={onBack} style={{ background:"none", border:"1px solid #1a3530", color:"#666", borderRadius:10, padding:"10px 16px", cursor:"pointer", fontSize:14, marginBottom:18, display:"flex", alignItems:"center", gap:6, minHeight:44 }}>← All Members</button>
+          <div style={{ background:"#0a1714", border:"1px solid #10AC8433", borderRadius:12, padding:"10px 15px", marginBottom:18, display:"flex", gap:9, fontSize:13, color:"#10AC84" }}>
+            🔒 <span><strong>Anonymous</strong> — peer scores are averaged. No individual response is visible.</span>
+          </div>
+          {loading ? (
+            <div style={{ textAlign:"center", padding:60, color:"#3a5a54" }}>Loading feedback data…</div>
+          ) : (
+            <>
+              <div style={{ background:`linear-gradient(135deg,${person.color}10,#0d1e1c)`, border:`1px solid ${person.color}30`, borderRadius:20, padding:22, marginBottom:16 }}>
+                <div style={{ display:"flex", alignItems:"center", gap:14, flexWrap:"wrap" }}>
+                  <div style={{ width:56, height:56, borderRadius:"50%", background:`linear-gradient(135deg,${person.color},${person.color}55)`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:15, fontWeight:800, color:"#fff", flexShrink:0 }}>{person.avatar}</div>
+                  <div style={{ flex:1, minWidth:0 }}>
+                    <h2 style={{ margin:"0 0 3px", fontSize:20, fontWeight:800, color:"#fff" }}>{person.name}</h2>
+                    <div style={{ color:"#3a5a54", fontSize:12 }}>{person.role}</div>
+                  </div>
+                  <div style={{ textAlign:"center" }}>
+                    <div style={{ fontSize:36, fontWeight:900, color:person.color, lineHeight:1 }}>{overall}</div>
+                    <div style={{ fontSize:10, color:"#2a4040", marginTop:3 }}>Overall / 5.0</div>
+                  </div>
+                </div>
+                <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:9, marginTop:16 }}>
+                  {[["🟡 Self",selfAvg!==null?selfAvg:"—","#F9A825"],["🔵 Peers",peersAvg!==null?peersAvg:"—","#54A0FF"],
+                    gap!==null?gap>0.5?["⚠ +"+gap+" gap","Self above peers","#FF9F43"]:gap<-0.5?["✨ +"+Math.abs(gap)+" gap","Peers above self","#54A0FF"]:["✓ Aligned","Self ≈ Peers",TEAL]:["📊 Peers",peerCount+" reviews","#54A0FF"]
+                  ].map(([top,bot,c])=>(
+                    <div key={top} style={{ background:"#0a141288", borderRadius:12, padding:"11px", textAlign:"center" }}>
+                      <div style={{ fontSize:m?15:18, fontWeight:800, color:c }}>{top}</div>
+                      <div style={{ fontSize:10, color:"#2a4040", marginTop:2 }}>{bot}</div>
+                    </div>
+                  ))}
+                </div>
+                {!selfData && (
+                  <button onClick={onGiveFeedback} style={{ marginTop:13, width:"100%", padding:"10px", background:TEAL+"22", border:`1px solid ${TEAL}44`, borderRadius:10, color:TEAL, fontSize:13, fontWeight:700, cursor:"pointer" }}>
+                    ⭐ You haven't submitted your self-rating yet — tap here to add it
+                  </button>
+                )}
+              </div>
+              <div style={{ display:"flex", gap:0, marginBottom:16, borderRadius:12, background:"#0d1e1c", padding:4 }}>
+                {[["gap","🔍 Self vs Peers"],["radar","🕸️ Radar"],["text","💬 Written"]].map(([k,l])=>(
+                  <button key={k} onClick={()=>setTab(k)} style={{ flex:1, padding:m?"12px 8px":"10px 16px", borderRadius:9, border:"none", cursor:"pointer", fontSize:m?12:13, fontWeight:600, background:tab===k?person.color:"transparent", color:tab===k?"#fff":"#3a5a54", minHeight:44 }}>{l}</button>
+                ))}
+              </div>
+              {tab==="gap"   && <GapView selfScores={selfData} peerScores={peerData} person={person}/>}
+              {tab==="radar" && <RadarView selfScores={selfData} peerScores={peerData} person={person}/>}
+              {tab==="text"  && (
+                <div style={{ display:"flex", flexDirection:"column", gap:13 }}>
+                  {[{title:"💪 Strengths — What peers wrote",items:textFeedback.strengths,bc:"#10AC84",empty:"No written strength feedback yet."},
+                    {title:"🎯 Growth Areas — Constructive input",items:textFeedback.improvements,bc:"#FF9F43",empty:"No written growth feedback yet."}
+                  ].map(({title,items,bc,empty})=>(
+                    <div key={title} style={{ background:"#0d1e1c", border:`1px solid ${bc}28`, borderRadius:20, padding:20 }}>
+                      <h3 style={{ margin:"0 0 13px", color:bc, fontSize:14, fontWeight:700 }}>{title}</h3>
+                      {items.length===0?<div style={{ color:"#2a4040", fontSize:13, fontStyle:"italic" }}>{empty}</div>
+                        :items.map((s,i)=>(
+                          <div key={i} style={{ background:bc+"0e", border:`1px solid ${bc}1c`, borderRadius:11, padding:"12px 15px", fontSize:13, color:"#bbb", lineHeight:1.75, marginBottom:i<items.length-1?8:0 }}>
+                            <span style={{ color:bc, marginRight:5 }}>"</span>{s}<span style={{ color:bc }}>"</span>
+                          </div>
+                        ))
+                      }
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      );
+    }
+
+    // ─── Team Card ────────────────────────────────────────────
+    function TeamCard({ person, onClick }) {
+      const [data, setData] = useState(null);
+      useEffect(() => {
+        loadAllFeedbackForPerson(person.id).then(({ selfData:sd, peerSubmissions }) => {
+          const peerAvg = peerSubmissions.length ? computePeerAvg(peerSubmissions) : null;
+          setData({ selfAvg:sd?avgObj(sd.scores):null, peersAvg:peerAvg?avgObj(peerAvg):null, peerCount:peerSubmissions.length });
+        });
+      }, [person.id]);
+      const overall = data?(data.selfAvg!==null&&data.peersAvg!==null?+((data.selfAvg+data.peersAvg)/2).toFixed(1):data.selfAvg??data.peersAvg??null):null;
+      const gap = data&&data.selfAvg!==null&&data.peersAvg!==null?+(data.selfAvg-data.peersAvg).toFixed(1):null;
+      return (
+        <div onClick={onClick} style={{ background:"#0d1e1c", border:"1px solid #0f2520", borderRadius:15, padding:16, cursor:"pointer", transition:"all 0.2s" }}
+          onMouseEnter={e=>{e.currentTarget.style.borderColor=person.color+"50";e.currentTarget.style.transform="translateY(-2px)";}}
+          onMouseLeave={e=>{e.currentTarget.style.borderColor="#0f2520";e.currentTarget.style.transform="none";}}>
+          <div style={{ display:"flex", alignItems:"center", gap:11 }}>
+            <div style={{ width:42, height:42, borderRadius:"50%", background:`linear-gradient(135deg,${person.color}88,${person.color}33)`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:12, fontWeight:800, color:person.color, border:`2px solid ${person.color}44`, flexShrink:0 }}>{person.avatar}</div>
+            <div style={{ flex:1, minWidth:0 }}>
+              <div style={{ fontWeight:700, fontSize:13, color:"#fff", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{person.name}</div>
+              <div style={{ fontSize:11, color:"#2a5050", marginTop:2, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{person.role}</div>
+            </div>
+            <div style={{ textAlign:"right", flexShrink:0 }}>
+              <div style={{ fontSize:20, fontWeight:800, color:overall?person.color:"#2a4040" }}>{overall??"—"}</div>
+              <div style={{ fontSize:9, color:"#1a3530" }}>/ 5.0</div>
+            </div>
+          </div>
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:6, marginTop:11 }}>
+            {[["🟡 Self",data?.selfAvg,"#F9A825"],["🔵 Peers",data?.peersAvg,"#54A0FF"]].map(([l,v,c])=>(
+              <div key={l} style={{ background:"#0a1412", borderRadius:7, padding:"5px 0", textAlign:"center" }}>
+                <div style={{ fontSize:13, fontWeight:700, color:v!==null?c:"#1a3530" }}>{v??"—"}</div>
+                <div style={{ fontSize:10, color:"#1a3530", marginTop:1 }}>{l}</div>
+              </div>
+            ))}
+          </div>
+          {gap!==null&&<div style={{ marginTop:8, textAlign:"center" }}>
+            <span style={{ fontSize:10, color:gap>0.5?"#FF9F43":gap<-0.5?"#54A0FF":TEAL, background:(gap>0.5?"#FF9F43":gap<-0.5?"#54A0FF":TEAL)+"14", borderRadius:6, padding:"3px 9px" }}>
+              {gap>0.5?`⚠ Self +${gap} above peers`:gap<-0.5?`✨ Peers +${Math.abs(gap)} above self`:"✓ Self & peers aligned"}
+            </span>
+          </div>}
+          {data&&data.selfAvg===null&&data.peersAvg===null&&<div style={{ marginTop:8, textAlign:"center", fontSize:10, color:"#1a3530" }}>No feedback yet</div>}
+        </div>
+      );
+    }
+
+    // ─── Knowledge Base ──────────────────────────────────────
+    const RESOURCES = {
+      videos: [
+        { id:"eT4tohLWeUw", title:"What is 360 Degree Feedback?", source:"Hudson Recruitment", duration:"2:59", desc:"A clear explainer of how 360° feedback works, who the raters are, and what to expect from the survey." },
+        { id:"A4TtNxnq9pQ", title:"The Power of Feedback — TED Talk", source:"TED", duration:"14:27", desc:"How honest feedback from peers transforms individual performance and team culture." },
+        { id:"1SmZYbfVHfk", title:"How to Give and Receive Feedback Effectively", source:"Harvard Business Review", duration:"6:34", desc:"Practical HBR framework for making feedback conversations productive rather than defensive." },
+      ],
+      articles: [
+        { url:"https://www.aihr.com/blog/360-degree-feedback/", title:"360-Degree Feedback: A Comprehensive Guide", source:"AIHR", tag:"Guide", desc:"Covers what it is, benefits, pitfalls, and best practices for HR and leadership teams." },
+        { url:"https://www.ccl.org/articles/leading-effectively-articles/3-ways-make-big-impact-360-degree-assessments/", title:"3 Ways to Make a Big Impact with 360 Assessments", source:"Center for Creative Leadership", tag:"Leadership", desc:"Practical tips from one of the world's top leadership development organisations." },
+        { url:"https://lattice.com/articles/what-is-a-360-degree-review", title:"What Is a 360-Degree Review? Best Practices", source:"Lattice", tag:"Best Practices", desc:"Definition, methodology, and how high-growth companies run effective 360 reviews." },
+        { url:"https://hbr.org/2016/07/getting-360-degree-feedback-right", title:"Getting 360-Degree Feedback Right", source:"Harvard Business Review", tag:"Research", desc:"How to avoid the common traps and make 360 feedback genuinely useful for development." },
+      ]
+    };
+
+    function KnowledgeBase() {
+      const [open, setOpen] = useState(false);
+      const [activeVideo, setActiveVideo] = useState(null);
+      const m = useMobile();
+      return (
+        <div style={{ marginBottom:20 }}>
+          <button onClick={()=>setOpen(o=>!o)}
+            style={{ width:"100%", background:"#0d1e1c", border:"1px solid #0f2520", borderRadius:open?"20px 20px 0 0":20, padding:"14px 18px", color:"#fff", cursor:"pointer", display:"flex", justifyContent:"space-between", alignItems:"center", textAlign:"left" }}>
+            <div>
+              <div style={{ fontSize:11, color:"#1a4040", fontWeight:700, letterSpacing:1, textTransform:"uppercase", marginBottom:2 }}>📚 Knowledge Base</div>
+              <div style={{ fontSize:12, color:"#1a3530" }}>Why peer reviews matter · Videos & articles</div>
+            </div>
+            <span style={{ color:TEAL, fontSize:20, transform:open?"rotate(90deg)":"none", transition:"transform 0.2s", lineHeight:1 }}>›</span>
+          </button>
+
+          {open && (
+            <div style={{ background:"#0d1e1c", border:"1px solid #0f2520", borderTop:"none", borderRadius:"0 0 20px 20px", padding:"0 18px 20px" }}>
+
+              <div style={{ paddingTop:18, marginBottom:16 }}>
+                <div style={{ fontSize:11, color:TEAL, fontWeight:700, textTransform:"uppercase", letterSpacing:1, marginBottom:12 }}>🎬 Watch</div>
+                <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+                  {RESOURCES.videos.map(v => (
+                    <div key={v.id}>
+                      <div onClick={()=>setActiveVideo(activeVideo===v.id?null:v.id)}
+                        style={{ background:"#0a1714", border:`1px solid ${activeVideo===v.id?TEAL+"55":"#1a3530"}`, borderRadius:activeVideo===v.id?"12px 12px 0 0":12, padding:"12px 14px", cursor:"pointer", display:"flex", gap:12, alignItems:"flex-start" }}>
+                        <div style={{ width:m?44:60, height:m?33:45, borderRadius:6, background:"#000", flexShrink:0, border:"1px solid #1a3530", position:"relative", overflow:"hidden" }}>
+                          <img src={`https://img.youtube.com/vi/${v.id}/mqdefault.jpg`} alt="" style={{ width:"100%", height:"100%", objectFit:"cover", opacity:0.85 }} onError={e=>{e.target.style.display='none';}}/>
+                          <div style={{ position:"absolute", inset:0, display:"flex", alignItems:"center", justifyContent:"center" }}>
+                            <div style={{ width:22, height:22, background:"#cc000099", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:9, color:"#fff" }}>▶</div>
+                          </div>
+                        </div>
+                        <div style={{ flex:1, minWidth:0 }}>
+                          <div style={{ fontSize:13, fontWeight:700, color:"#fff", marginBottom:3, lineHeight:1.4 }}>{v.title}</div>
+                          <div style={{ fontSize:11, color:"#2a5050" }}>{v.source} · {v.duration}</div>
+                          <div style={{ fontSize:11, color:"#1a4040", marginTop:4, lineHeight:1.5 }}>{v.desc}</div>
+                        </div>
+                        <span style={{ color:activeVideo===v.id?TEAL:"#2a5050", fontSize:14, flexShrink:0, marginTop:2 }}>{activeVideo===v.id?"▲":"▼"}</span>
+                      </div>
+                      {activeVideo===v.id && (
+                        <div style={{ overflow:"hidden", aspectRatio:"16/9", background:"#000", borderRadius:"0 0 12px 12px" }}>
+                          <iframe width="100%" height="100%" src={`https://www.youtube.com/embed/${v.id}?autoplay=1`}
+                            title={v.title} frameBorder="0" allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen style={{ display:"block" }}/>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div style={{ borderTop:"1px solid #0f2520", paddingTop:16 }}>
+                <div style={{ fontSize:11, color:"#54A0FF", fontWeight:700, textTransform:"uppercase", letterSpacing:1, marginBottom:12 }}>📖 Read</div>
+                <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+                  {RESOURCES.articles.map(a => (
+                    <a key={a.url} href={a.url} target="_blank" rel="noopener noreferrer"
+                      style={{ background:"#0a1714", border:"1px solid #1a3530", borderRadius:12, padding:"12px 14px", textDecoration:"none", display:"flex", gap:10, alignItems:"flex-start", transition:"border-color 0.15s" }}>
+                      <div style={{ flex:1 }}>
+                        <div style={{ fontSize:13, fontWeight:700, color:"#fff", marginBottom:3, lineHeight:1.4 }}>{a.title}</div>
+                        <div style={{ fontSize:11, color:"#2a5050", marginBottom:4 }}>{a.source}</div>
+                        <div style={{ fontSize:11, color:"#1a4040", lineHeight:1.5 }}>{a.desc}</div>
+                      </div>
+                      <div style={{ display:"flex", flexDirection:"column", alignItems:"flex-end", gap:6, flexShrink:0 }}>
+                        <span style={{ fontSize:9, background:"#54A0FF22", color:"#54A0FF", border:"1px solid #54A0FF33", borderRadius:5, padding:"2px 7px", fontWeight:700 }}>{a.tag}</span>
+                        <span style={{ color:"#2a5050", fontSize:16 }}>↗</span>
+                      </div>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // ─── Admin Import Panel ───────────────────────────────────
+    function AdminPanel({ onClose }) {
+      const [codes, setCodes]   = useState("");
+      const [result, setResult] = useState(null);
+      const [loading, setLoading] = useState(false);
+      const m = useMobile();
+
+      async function handleImport() {
+        if (!codes.trim()) return;
+        setLoading(true);
+        const res = await importCodes(codes);
+        setResult(res);
+        setLoading(false);
+        if (res.ok > 0) setCodes("");
+      }
+
+      async function handleClear() {
+        if (!window.confirm("Clear ALL feedback data from this device? This cannot be undone.")) return;
+        localStorage.removeItem(DB_KEY);
+        setResult({ cleared: true });
+      }
+
+      return (
+        <div style={{ position:"fixed", inset:0, background:"#000a", zIndex:200, display:"flex", alignItems:"center", justifyContent:"center", padding:16 }}>
+          <div style={{ background:"#0d1e1c", border:"1px solid #1a3530", borderRadius:20, padding:24, width:"100%", maxWidth:480, maxHeight:"90vh", overflowY:"auto" }}>
+            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:18 }}>
+              <h2 style={{ color:"#fff", fontSize:17, fontWeight:800, margin:0 }}>🔐 Admin Panel</h2>
+              <button onClick={onClose} style={{ background:"none", border:"1px solid #1a3530", color:"#888", borderRadius:8, padding:"6px 12px", cursor:"pointer", fontSize:13 }}>✕ Close</button>
+            </div>
+
+            <div style={{ background:"#0a1714", border:"1px solid #10AC8430", borderRadius:12, padding:14, marginBottom:18, fontSize:12, color:"#2a6050", lineHeight:1.7 }}>
+              📱 <strong style={{ color:TEAL }}>How it works:</strong> Each team member copies their submission code after submitting. Paste all the codes here (one per line or comma-separated) to import them into the dashboard.
+            </div>
+
+            <label style={{ fontSize:12, fontWeight:700, color:"#aaa", display:"block", marginBottom:8 }}>Paste submission codes from your team</label>
+            <textarea value={codes} onChange={e=>{ setCodes(e.target.value); setResult(null); }} rows={6}
+              placeholder="Paste codes here, one per line…"
+              style={{ width:"100%", background:"#060f0e", border:"1px solid #1a3530", borderRadius:10, padding:"10px 12px", color:"#ccc", fontSize:11, fontFamily:"monospace", resize:"vertical", lineHeight:1.5 }}/>
+
+            <button onClick={handleImport} disabled={loading || !codes.trim()}
+              style={{ width:"100%", marginTop:10, padding:"12px", background:codes.trim()?TEAL:"#0f1e1c", border:"none", borderRadius:10, color:codes.trim()?"#fff":"#2a4040", fontSize:14, fontWeight:700, cursor:codes.trim()?"pointer":"not-allowed" }}>
+              {loading?"Importing…":"⬆ Import Codes"}
+            </button>
+
+            {result && !result.cleared && (
+              <div style={{ marginTop:12, padding:"10px 14px", background: result.ok>0?"#10AC8420":"#FF6B6B20", border:`1px solid ${result.ok>0?"#10AC8440":"#FF6B6B40"}`, borderRadius:10, fontSize:13, color: result.ok>0?TEAL:"#FF6B6B", textAlign:"center" }}>
+                {result.ok>0?`✓ ${result.ok} submission${result.ok!==1?"s":""} imported successfully!`:""}
+                {result.fail>0?` ${result.fail} code${result.fail!==1?"s":""} could not be read.`:""}
+              </div>
+            )}
+            {result?.cleared && (
+              <div style={{ marginTop:12, padding:"10px 14px", background:"#FF6B6B20", border:"1px solid #FF6B6B40", borderRadius:10, fontSize:13, color:"#FF6B6B", textAlign:"center" }}>
+                ✓ All local data cleared.
+              </div>
+            )}
+
+            <div style={{ borderTop:"1px solid #0f2520", marginTop:20, paddingTop:16 }}>
+              <button onClick={handleClear} style={{ width:"100%", padding:"10px", background:"none", border:"1px solid #FF6B6B40", borderRadius:10, color:"#FF6B6B88", fontSize:12, cursor:"pointer" }}>
+                🗑 Clear all local feedback data
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ─── App ─────────────────────────────────────────────────
+    function App() {
+      const [view, setView]         = useState("home");
+      const [selected, setSelected] = useState(null);
+      const [search, setSearch]     = useState("");
+      const [adminOpen, setAdminOpen] = useState(false);
+      const m = useMobile();
+      const filtered = TEAM.filter(p => p.name.toLowerCase().includes(search.toLowerCase()) || p.role.toLowerCase().includes(search.toLowerCase()));
+      const person = TEAM.find(p => p.id === selected);
+      function goHome() { setView("home"); setSelected(null); }
+      return (
+        <div style={{ minHeight:"100vh", background:"#060f0e", color:"#fff" }}>
+          {adminOpen && <AdminPanel onClose={()=>setAdminOpen(false)}/>}
+          <div style={{ borderBottom:"1px solid #0d1e1c", padding:m?"10px 14px":"13px 24px", display:"flex", alignItems:"center", justifyContent:"space-between", position:"sticky", top:0, background:"#060f0eee", backdropFilter:"blur(24px)", zIndex:100 }}>
+            <div onClick={goHome} style={{ cursor:"pointer", flexShrink:0 }}>
+              <div style={{ transform:m?"scale(0.78)":"scale(1)", transformOrigin:"left center" }}><InPrimeLogo/></div>
+            </div>
+            <div style={{ display:"flex", alignItems:"center", gap:m?8:10 }}>
+              {view !== "form" && (
+                <button onClick={()=>setView("form")} style={{ padding:m?"10px 12px":"8px 16px", background:TEAL, border:"none", borderRadius:10, color:"#fff", fontSize:13, fontWeight:700, cursor:"pointer", minHeight:44 }}>
+                  {m?"✏️ Feedback":"✏️ Give Feedback"}
+                </button>
+              )}
+              <button onClick={()=>setAdminOpen(true)} title="Admin — import codes" style={{ padding:"8px 10px", background:"#0a1714", border:"1px solid #1a3530", borderRadius:10, color:"#2a5050", fontSize:13, cursor:"pointer", minHeight:44 }}>🔐</button>
+              {!m && <div style={{ fontSize:10, color:"#1a3530", textAlign:"right" }}><div style={{ color:"#2a4a44" }}>360° Feedback</div><div>Core Team · Q2</div></div>}
+            </div>
+          </div>
+          <div style={{ maxWidth:900, margin:"0 auto", padding:m?"18px 12px":"22px 16px" }}>
+            {view==="form" && <FeedbackForm onBack={goHome}/>}
+            {view==="dashboard" && person && <Dashboard person={person} onBack={goHome} onGiveFeedback={()=>setView("form")}/>}
+            {view==="home" && (
+              <>
+                <div style={{ textAlign:"center", marginBottom:26 }}>
+                  <h1 style={{ fontSize:"clamp(20px,5vw,32px)", fontWeight:900, margin:0, letterSpacing:"-0.5px" }}>Core Team <span style={{ color:TEAL }}>360° Feedback</span></h1>
+                  <p style={{ color:"#2a5050", marginTop:8, fontSize:14 }}>Tap your name to see your report · Tap <strong style={{ color:TEAL }}>"Give Feedback"</strong> to review a colleague</p>
+                  <div style={{ display:"inline-flex", alignItems:"center", gap:6, marginTop:8, background:"#0a1714", border:`1px solid ${TEAL}22`, borderRadius:20, padding:"6px 14px", fontSize:12, color:TEAL }}>
+                    🔒 Anonymous · Self vs Peers · 10 InPrime-specific dimensions
+                  </div>
+                </div>
+                <div style={{ background:"#0d1e1c", border:"1px solid #0f2520", borderRadius:20, padding:18, marginBottom:20 }}>
+                  <div style={{ fontSize:11, color:"#1a4040", fontWeight:700, letterSpacing:1, textTransform:"uppercase", marginBottom:3 }}>10 Feedback Dimensions</div>
+                  <div style={{ fontSize:12, color:"#1a3530", marginBottom:13 }}>Tap any to read what it means and why it matters</div>
+                  <ParamInfo/>
+                </div>
+                <KnowledgeBase/>
+                <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search by name or role…"
+                  style={{ width:"100%", background:"#0d1e1c", border:"1px solid #0f2520", borderRadius:11, padding:"11px 15px", color:"#ccc", fontSize:14, marginBottom:14, outline:"none" }}/>
+                <div style={{ display:"grid", gridTemplateColumns:m?"repeat(2,1fr)":"repeat(auto-fill,minmax(255px,1fr))", gap:m?8:11 }}>
+                  {filtered.map(p => <TeamCard key={p.id} person={p} onClick={()=>{setSelected(p.id);setView("dashboard");}}/>)}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>
