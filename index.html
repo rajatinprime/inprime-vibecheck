@@ -89,28 +89,24 @@
 
     const PARAM_KEYS = PARAMS.map(p => p.key);
 
-    // ─── JSONBin Cloud Storage ──────────────────────────────
+    // ─── Firebase Realtime Database ─────────────────────────
     // Data shape: { feedback: { "reviewerId:revieweeId": { scores, strengthText, growthText, submittedAt } } }
-    const JSONBIN_ID  = "69d28b9b856a682189006a1e";
-    const JSONBIN_KEY = "$2a$10$zD2j7f3UqUwpFGyaV8jwWOjuAHfsslleHDPeQcRxVm24rlEbjvqru";
-    const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_ID}`;
+    const FB_URL = "https://inprime-360-feedback-default-rtdb.asia-southeast1.firebasedatabase.app/feedback.json";
 
     async function dbRead() {
       try {
-        const res = await fetch(`${JSONBIN_URL}/latest`, {
-          headers: { "X-MASTER-KEY": JSONBIN_KEY }
-        });
+        const res = await fetch(FB_URL);
         const json = await res.json();
-        return json.record || { feedback: {} };
+        return { feedback: json || {} };
       } catch(e) { console.error("dbRead failed", e); return { feedback: {} }; }
     }
 
     async function dbWrite(data) {
       try {
-        await fetch(JSONBIN_URL, {
+        await fetch(FB_URL, {
           method: "PUT",
-          headers: { "X-MASTER-KEY": JSONBIN_KEY, "Content-Type": "application/json" },
-          body: JSON.stringify(data)
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data.feedback)
         });
       } catch(e) { console.error("dbWrite failed", e); }
     }
