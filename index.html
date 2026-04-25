@@ -21,7 +21,13 @@
   </style>
 </head>
 <body>
-  <div id="root"></div>
+  <div id="root">
+    <div id="boot-msg" style="min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#9ab5af;font-family:system-ui,sans-serif;padding:20px;text-align:center">
+      <div style="font-size:32px;margin-bottom:12px">⏳</div>
+      <div style="font-size:14px;font-weight:600;color:#fff">Loading InPrime 360° Feedback…</div>
+      <div style="font-size:12px;margin-top:8px;max-width:360px;line-height:1.5">If this message stays visible for more than 10 seconds, your browser may be blocking the CDN scripts (React/Babel). Try a hard refresh (Cmd+Shift+R) or disable ad-blockers for this page.</div>
+    </div>
+  </div>
 
   <!-- No backend setup required — data stored locally, shared via codes -->
 
@@ -52,15 +58,15 @@
 
     // ─── Team ────────────────────────────────────────────────
     const TEAM = [
-      { id:4,  name:"Dhruman Jani",         role:"Founding Member · Credit Analytics",  avatar:"DJ", color:"#F9A825" },
-      { id:5,  name:"Siddharth Jagani",     role:"Founding Member · Product & Growth",  avatar:"SJ", color:"#FF7043" },
-      { id:6,  name:"Harsha Vardhan",       role:"VP of Engineering",                   avatar:"HV", color:"#7C4DFF" },
-      { id:7,  name:"Chandrasekhar A",      role:"Founding Member · Business",          avatar:"CA", color:"#00BCD4" },
-      { id:8,  name:"Abhijit Korti",        role:"Founding Member · Digital & Product", avatar:"AK", color:"#EE5A24" },
-      { id:9,  name:"Soham Bhattacharya",   role:"Founding Team · Finance",             avatar:"SB", color:"#26A69A" },
-      { id:10, name:"Rohit Parashar",       role:"Founding Member · Operations",        avatar:"RP", color:"#EF5350" },
-      { id:11, name:"Shrungeshwara C N",    role:"Core Team",                           avatar:"SC", color:"#5C6BC0" },
-      { id:12, name:"Jagrithi K",           role:"Core Team",                           avatar:"JK", color:"#EC407A" },
+      { id:4,  name:"Dhruman Jani",         role:"Founding Member · Credit & Analytics",              avatar:"DJ", color:"#F9A825" },
+      { id:5,  name:"Siddharth Jagani",     role:"Founding Member · Product & Growth",                avatar:"SJ", color:"#FF7043" },
+      { id:6,  name:"Harsha Vardhan",       role:"Founding Member · Engineering",                     avatar:"HV", color:"#7C4DFF" },
+      { id:7,  name:"Chandrasekhar A",      role:"Founding Member · Business",                        avatar:"CA", color:"#00BCD4" },
+      { id:8,  name:"Abhijit Korti",        role:"Founding Member · Marketing & Customer Success",    avatar:"AK", color:"#EE5A24" },
+      { id:9,  name:"Soham Bhattacharya",   role:"Founding Member · Finance",                         avatar:"SB", color:"#26A69A" },
+      { id:10, name:"Rohit Parashar",       role:"Founding Member · Business",                        avatar:"RP", color:"#EF5350" },
+      { id:11, name:"Shrungeshwara C N",    role:"Founding Member · Operations",                      avatar:"SC", color:"#5C6BC0" },
+      { id:12, name:"Jagrithi K",           role:"Founding Member · HR",                              avatar:"JK", color:"#EC407A" },
     ];
 
     // ─── Parameters ──────────────────────────────────────────
@@ -89,9 +95,74 @@
 
     const PARAM_KEYS = PARAMS.map(p => p.key);
 
+    // ─── Five Dysfunctions of a Team ─────────────────────────
+    const DYSFUNCTION_STATEMENTS = [
+      { id:1,  text:"Team members are passionate and unguarded in their discussion of issues." },
+      { id:2,  text:"Team members call out one another's deficiencies or unproductive behaviors." },
+      { id:3,  text:"Team members know what their peers are working on and how they contribute to the collective good of the team." },
+      { id:4,  text:"Team members quickly and genuinely apologize to one another when they say or do something inappropriate or possibly damaging to the team." },
+      { id:5,  text:"Team members willingly make sacrifices (such as budget, turf, head count) in their departments or areas of expertise for the good of the team." },
+      { id:6,  text:"Team members openly admit their weaknesses and mistakes." },
+      { id:7,  text:"Team meetings are compelling, and not boring." },
+      { id:8,  text:"Team members leave meetings confident that their peers are completely committed to the decisions that were agreed on, even if there was initial disagreement." },
+      { id:9,  text:"Morale is significantly affected by the failure to achieve team goals." },
+      { id:10, text:"During team meetings, the most important — and difficult — issues are put on the table to be resolved." },
+      { id:11, text:"Team members are deeply concerned about the prospect of letting down their peers." },
+      { id:12, text:"Team members know about one another's personal lives and are comfortable discussing them." },
+      { id:13, text:"Team members end discussions with clear and specific resolutions and calls to action." },
+      { id:14, text:"Team members challenge one another about their plans and approaches." },
+      { id:15, text:"Team members are slow to seek credit for their own contributions, but quick to point out those of others." },
+    ];
+
+    const DYSFUNCTIONS = [
+      { key:"trust",           label:"Absence of Trust",          icon:"🛡️", questions:[4,6,12],
+        detail:"Teams that lack trust are incapable of engaging in unfiltered and passionate debate. Members are unable to admit weaknesses, fears or mistakes — so they resort to posturing and politics." },
+      { key:"conflict",        label:"Fear of Conflict",          icon:"⚔️", questions:[1,7,10],
+        detail:"Without trust, teams cannot engage in open, constructive conflict. Meetings become boring and important issues go unresolved, creating a dangerous environment of artificial harmony." },
+      { key:"commitment",      label:"Lack of Commitment",        icon:"🎯", questions:[3,8,13],
+        detail:"Without the chance to voice opinions in open debate, team members rarely buy in to decisions. Ambiguity persists about direction and priorities, and opportunities slip away." },
+      { key:"accountability",  label:"Avoidance of Accountability", icon:"⚖️", questions:[2,11,14],
+        detail:"Without commitment, team members hesitate to call their peers on actions and behaviors that seem counterproductive. Standards erode, resentments build, and mediocrity spreads." },
+      { key:"results",         label:"Inattention to Results",    icon:"🏆", questions:[5,9,15],
+        detail:"When team members put individual needs — ego, career development, recognition — above the collective goals of the team, the team loses. Achievement-oriented members disengage." },
+    ];
+
+    function classifyDysfunction(total) {
+      if (total >= 8) return { band:"good",   color:"#16A34A", bg:"#052e1a", label:"Not a problem",  tip:"A score of 8 or 9 is a probable indication that the dysfunction is not a problem for your team." };
+      if (total >= 6) return { band:"warn",   color:"#EAB308", bg:"#332a00", label:"Could be a problem", tip:"A score of 6 or 7 indicates that the dysfunction could be a problem." };
+      return           { band:"issue",  color:"#EF4444", bg:"#3a0e0e", label:"Needs to be addressed", tip:"A score of 3 to 5 is probably an indication that the dysfunction needs to be addressed." };
+    }
+
     // ─── Firebase Realtime Database ─────────────────────────
     // Data shape: { feedback: { "reviewerId:revieweeId": { scores, strengthText, growthText, submittedAt } } }
     const FB_URL = "https://inprime-360-feedback-default-rtdb.asia-southeast1.firebasedatabase.app/feedback.json";
+    const DF_URL = "https://inprime-360-feedback-default-rtdb.asia-southeast1.firebasedatabase.app/dysfunction.json";
+
+    async function dfRead() {
+      try {
+        const res = await fetch(DF_URL);
+        const json = await res.json();
+        return json || {};
+      } catch(e) { console.error("dfRead failed", e); return {}; }
+    }
+
+    async function dfWrite(data) {
+      try {
+        await fetch(DF_URL, { method:"PUT", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(data) });
+      } catch(e) { console.error("dfWrite failed", e); }
+    }
+
+    async function saveDysfunctionSubmission(reviewerId, answers) {
+      const data = await dfRead();
+      data[String(reviewerId)] = { answers, submittedAt: new Date().toISOString() };
+      await dfWrite(data);
+      return true;
+    }
+
+    async function loadMyDysfunction(reviewerId) {
+      const data = await dfRead();
+      return data[String(reviewerId)] || null;
+    }
 
     async function dbRead() {
       try {
@@ -244,7 +315,7 @@
                 <span style={{ fontSize:12, color:TEAL, fontWeight:700 }}>
                   {step===1?"Step 1 of 4 — Who are you?":step===2?"Step 2 of 4 — Who are you reviewing?":step===3?"Step 3 of 4 — Rate each dimension":"Step 4 of 4 — Written feedback"}
                 </span>
-                <span style={{ fontSize:11, color:"#2a4a44" }}>{Math.round(progressPct)}%</span>
+                <span style={{ fontSize:11, color:"#9ab5af" }}>{Math.round(progressPct)}%</span>
               </div>
               <div style={{ background:"#0d1e1c", borderRadius:4, height:5, overflow:"hidden" }}>
                 <div style={{ width:`${progressPct}%`, height:"100%", background:`linear-gradient(90deg,${TEAL},#54A0FF)`, borderRadius:4, transition:"width 0.4s" }}/>
@@ -255,7 +326,7 @@
           {step === 1 && (
             <div style={{ background:"#0d1e1c", border:"1px solid #0f2520", borderRadius:20, padding:24 }}>
               <h2 style={{ margin:"0 0 5px", fontSize:19, fontWeight:800, color:"#fff" }}>Give 360° Feedback</h2>
-              <p style={{ color:"#3a5a54", fontSize:13, margin:"0 0 18px", lineHeight:1.6 }}>First, tell us who you are. This routes your feedback as <strong style={{color:"#fff"}}>self-rating</strong> or <strong style={{color:"#fff"}}>peer feedback</strong>.</p>
+              <p style={{ color:"#9ab5af", fontSize:13, margin:"0 0 18px", lineHeight:1.6 }}>First, tell us who you are. This routes your feedback as <strong style={{color:"#fff"}}>self-rating</strong> or <strong style={{color:"#fff"}}>peer feedback</strong>.</p>
               <div style={{ background:"#0a1714", border:`1px solid ${TEAL}28`, borderRadius:12, padding:"10px 14px", marginBottom:18, fontSize:13, color:TEAL, display:"flex", gap:8 }}>
                 🔒 <span>Peer feedback is always <strong>fully anonymous</strong>. Only self-ratings are linked to your name.</span>
               </div>
@@ -267,7 +338,7 @@
                     <div style={{ width:32, height:32, borderRadius:"50%", background:`linear-gradient(135deg,${p.color}88,${p.color}33)`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:800, color:p.color, flexShrink:0 }}>{p.avatar}</div>
                     <div style={{ minWidth:0 }}>
                       <div style={{ fontSize:12, fontWeight:700, color:"#fff", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{p.name}</div>
-                      <div style={{ fontSize:10, color:"#3a5a54", marginTop:1 }}>{p.role.split("·")[0].trim()}</div>
+                      <div style={{ fontSize:10, color:"#9ab5af", marginTop:1 }}>{p.role.split("·")[0].trim()}</div>
                     </div>
                     {reviewerId===p.id && <span style={{ color:TEAL, fontSize:14, marginLeft:"auto", flexShrink:0 }}>✓</span>}
                   </div>
@@ -286,7 +357,7 @@
                 <div style={{ width:36, height:36, borderRadius:"50%", background:`linear-gradient(135deg,${reviewer.color},${reviewer.color}55)`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:12, fontWeight:800, color:"#fff", flexShrink:0 }}>{reviewer.avatar}</div>
                 <div>
                   <div style={{ fontSize:15, fontWeight:800, color:"#fff" }}>Hi, {reviewer.name.split(" ")[0]} 👋</div>
-                  <div style={{ fontSize:12, color:"#3a5a54" }}>Who would you like to review?</div>
+                  <div style={{ fontSize:12, color:"#9ab5af" }}>Who would you like to review?</div>
                 </div>
               </div>
               <div style={{ background:"#0a1714", border:"1px solid #1a3530", borderRadius:12, padding:"10px 14px", marginBottom:16, fontSize:12 }}>
@@ -322,7 +393,7 @@
                 <div style={{ width:40, height:40, borderRadius:"50%", background:`linear-gradient(135deg,${reviewee.color},${reviewee.color}55)`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:13, fontWeight:800, color:"#fff", flexShrink:0 }}>{reviewee.avatar}</div>
                 <div>
                   <div style={{ fontWeight:800, fontSize:15, color:"#fff" }}>{isSelf?"⭐ Self-Rating":`🔵 Peer Feedback for ${reviewee.name}`}</div>
-                  <div style={{ fontSize:12, color:"#3a5a54", marginTop:2 }}>{isSelf?"Be honest — this is private to you.":"Rate each dimension 1–5. Fully anonymous."}</div>
+                  <div style={{ fontSize:12, color:"#9ab5af", marginTop:2 }}>{isSelf?"Be honest — this is private to you.":"Rate each dimension 1–5. Fully anonymous."}</div>
                 </div>
               </div>
               <div style={{ display:"flex", flexDirection:"column", gap:9 }}>
@@ -332,7 +403,7 @@
                       <span style={{ fontSize:20, flexShrink:0 }}>{p.icon}</span>
                       <div style={{ flex:1 }}>
                         <div style={{ fontWeight:700, fontSize:13, color:"#fff" }}>{p.label}</div>
-                        <div style={{ fontSize:11, color:"#2a5050", marginTop:2 }}>{p.short}</div>
+                        <div style={{ fontSize:11, color:"#b8cfca", marginTop:2 }}>{p.short}</div>
                       </div>
                       {scores[p.key]>0 && <span style={{ fontSize:12, color:"#F9A825", fontWeight:700, flexShrink:0 }}>{scores[p.key]}/5</span>}
                     </div>
@@ -351,7 +422,7 @@
             <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
               <div style={{ background:"#0d1e1c", border:"1px solid #0f2520", borderRadius:20, padding:22 }}>
                 <h3 style={{ margin:"0 0 5px", fontSize:17, fontWeight:800, color:"#fff" }}>{isSelf?"Your Self-Reflection":`Written Feedback for ${reviewee.name.split(" ")[0]}`}</h3>
-                <p style={{ color:"#3a5a54", fontSize:13, margin:"0 0 18px" }}>Optional but valuable. Be specific. {!isSelf&&"Fully anonymous."}</p>
+                <p style={{ color:"#9ab5af", fontSize:13, margin:"0 0 18px" }}>Optional but valuable. Be specific. {!isSelf&&"Fully anonymous."}</p>
                 <div style={{ marginBottom:16 }}>
                   <label style={{ display:"block", fontSize:13, color:"#10AC84", fontWeight:700, marginBottom:8 }}>💪 {isSelf?"What am I most proud of this period?":`What does ${reviewee.name.split(" ")[0]} do really well?`}</label>
                   <textarea value={strengthText} onChange={e=>setStrengthText(e.target.value)} rows={4}
@@ -366,7 +437,7 @@
                 </div>
               </div>
               <div style={{ background:"#0d1e1c", border:"1px solid #0f2520", borderRadius:16, padding:16 }}>
-                <div style={{ fontSize:11, color:"#2a5050", fontWeight:700, textTransform:"uppercase", letterSpacing:0.8, marginBottom:11 }}>Your Scores</div>
+                <div style={{ fontSize:11, color:"#b8cfca", fontWeight:700, textTransform:"uppercase", letterSpacing:0.8, marginBottom:11 }}>Your Scores</div>
                 <div style={{ display:"grid", gridTemplateColumns:"repeat(2,1fr)", gap:6 }}>
                   {PARAMS.map(p => { const v=scores[p.key]; const c=v>=4?"#10AC84":v>=3?"#F9A825":"#FF6B6B"; return (
                     <div key={p.key} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", background:"#0a1714", borderRadius:8, padding:"7px 11px" }}>
@@ -380,7 +451,7 @@
                 style={{ width:"100%", padding:"16px", background:saving?"#0f1e1c":TEAL, border:"none", borderRadius:12, color:"#fff", fontSize:15, fontWeight:700, cursor:saving?"not-allowed":"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:8 }}>
                 {saving?"Saving…":(isSelf?"✓ Save My Self-Rating":"✓ Submit Anonymous Feedback")}
               </button>
-              {!isSelf && <div style={{ textAlign:"center", fontSize:11, color:"#1a3530" }}>Your name is never stored with this submission</div>}
+              {!isSelf && <div style={{ textAlign:"center", fontSize:11, color:"#9ab5af" }}>Your name is never stored with this submission</div>}
             </div>
           )}
 
@@ -388,10 +459,10 @@
             <div style={{ background:"#0d1e1c", border:`1px solid ${TEAL}33`, borderRadius:20, padding:m?24:40, textAlign:"center" }}>
               <div style={{ fontSize:52, marginBottom:14 }}>{isSelf?"⭐":"✅"}</div>
               <h2 style={{ color:"#fff", fontSize:21, fontWeight:800, margin:"0 0 10px" }}>{isSelf?"Self-rating saved!":"Feedback submitted!"}</h2>
-              <p style={{ color:"#3a5a54", fontSize:14, lineHeight:1.7, margin:"0 0 16px", maxWidth:380, marginLeft:"auto", marginRight:"auto" }}>
+              <p style={{ color:"#9ab5af", fontSize:14, lineHeight:1.7, margin:"0 0 16px", maxWidth:380, marginLeft:"auto", marginRight:"auto" }}>
                 {isSelf?`Your self-rating has been saved, ${reviewer?.name.split(" ")[0]}.`:`Your anonymous feedback for ${reviewee?.name} has been recorded.`}
               </p>
-              {!isSelf && <div style={{ background:"#0a1714", borderRadius:10, padding:"10px 18px", marginBottom:16, fontSize:12, color:"#2a5050", display:"inline-block" }}>🔒 Not linked to your identity</div>}
+              {!isSelf && <div style={{ background:"#0a1714", borderRadius:10, padding:"10px 18px", marginBottom:16, fontSize:12, color:"#b8cfca", display:"inline-block" }}>🔒 Not linked to your identity</div>}
 
               <div style={{ background:"#0a1714", border:`1px solid ${TEAL}30`, borderRadius:14, padding:16, marginBottom:20, textAlign:"center" }}>
                 <div style={{ fontSize:13, color:TEAL, fontWeight:700, marginBottom:6 }}>☁️ Saved to shared dashboard</div>
@@ -415,7 +486,7 @@
       if (!hasSelf && !hasPeers) return (
         <div style={{ background:"#0d1e1c", border:"1px solid #0f2520", borderRadius:20, padding:40, textAlign:"center" }}>
           <div style={{ fontSize:40, marginBottom:12 }}>📭</div>
-          <div style={{ color:"#3a5a54", fontSize:14 }}>No feedback yet for {person.name.split(" ")[0]}.</div>
+          <div style={{ color:"#9ab5af", fontSize:14 }}>No feedback yet for {person.name.split(" ")[0]}.</div>
           <div style={{ color:"#2a4040", fontSize:12, marginTop:6 }}>Scores appear once self-rating and peer reviews are submitted.</div>
         </div>
       );
@@ -426,7 +497,7 @@
       return (
         <div style={{ background:"#0d1e1c", border:"1px solid #1a3530", borderRadius:20, padding:22 }}>
           <h3 style={{ color:"#fff", margin:"0 0 4px", fontSize:16, fontWeight:800 }}>🔍 Self vs Peer Perception</h3>
-          <p style={{ color:"#2a5050", fontSize:12, margin:"0 0 14px", lineHeight:1.6 }}>
+          <p style={{ color:"#b8cfca", fontSize:12, margin:"0 0 14px", lineHeight:1.6 }}>
             {hasSelf&&hasPeers?"Biggest gaps — your richest signals for growth.":!hasSelf?"Peer scores shown. Add your self-rating to see the comparison.":"Your self-rating shown. Peer scores appear once colleagues submit."}
           </p>
           <div style={{ display:"flex", gap:14, marginBottom:12, flexWrap:"wrap" }}>
@@ -472,7 +543,7 @@
     // ─── Radar View (pure SVG, no external lib) ──────────────
     function RadarView({ selfScores, peerScores, person }) {
       const hasBoth=selfScores&&peerScores, src=selfScores||peerScores;
-      if (!src) return <div style={{ background:"#0d1e1c", border:"1px solid #0f2520", borderRadius:20, padding:40, textAlign:"center" }}><div style={{ color:"#3a5a54", fontSize:14 }}>No data yet — submit feedback to see the radar.</div></div>;
+      if (!src) return <div style={{ background:"#0d1e1c", border:"1px solid #0f2520", borderRadius:20, padding:40, textAlign:"center" }}><div style={{ color:"#9ab5af", fontSize:14 }}>No data yet — submit feedback to see the radar.</div></div>;
       const cx=200, cy=200, r=140, n=PARAMS.length;
       function pt(i, val) {
         const angle = (Math.PI*2*i/n) - Math.PI/2;
@@ -486,7 +557,7 @@
       return (
         <div style={{ background:"#0d1e1c", border:"1px solid #1a3530", borderRadius:20, padding:22 }}>
           <h3 style={{ color:"#ddd", margin:"0 0 4px", fontSize:16, fontWeight:700 }}>🕸️ Radar View</h3>
-          <p style={{ color:"#2a5050", fontSize:12, margin:"0 0 14px" }}>{hasBoth?"Overlap shows alignment between self and peer perception.":selfScores?"Your self-rating across all 10 dimensions.":"Peer average across all 10 dimensions."}</p>
+          <p style={{ color:"#b8cfca", fontSize:12, margin:"0 0 14px" }}>{hasBoth?"Overlap shows alignment between self and peer perception.":selfScores?"Your self-rating across all 10 dimensions.":"Peer average across all 10 dimensions."}</p>
           <svg viewBox="0 0 400 400" style={{ width:"100%", maxWidth:400, display:"block", margin:"0 auto" }}>
             {gridLevels.map(lvl => (
               <polygon key={lvl} points={PARAMS.map((_,i)=>pt(i,lvl).join(",")).join(" ")} fill="none" stroke="#1a3530" strokeWidth="1"/>
@@ -525,9 +596,9 @@
                 <div style={{ width:34, height:34, borderRadius:9, background:c+"1a", display:"flex", alignItems:"center", justifyContent:"center", fontSize:17, flexShrink:0 }}>{p.icon}</div>
                 <div style={{ flex:1 }}>
                   <div style={{ fontWeight:700, fontSize:13, color:isOpen?c:"#ddd" }}>{p.label}</div>
-                  <div style={{ fontSize:11, color:"#2a4a44", marginTop:1 }}>{p.short}</div>
+                  <div style={{ fontSize:11, color:"#9ab5af", marginTop:1 }}>{p.short}</div>
                 </div>
-                <div style={{ color:"#1a3530", fontSize:11, transition:"transform 0.2s", transform:isOpen?"rotate(180deg)":"none" }}>▼</div>
+                <div style={{ color:"#9ab5af", fontSize:11, transition:"transform 0.2s", transform:isOpen?"rotate(180deg)":"none" }}>▼</div>
               </div>
               {isOpen && <div style={{ marginTop:11, paddingTop:11, borderTop:`1px solid ${c}18`, fontSize:13, color:"#6a8a84", lineHeight:1.85 }}>{p.detail}</div>}
             </div>
@@ -570,7 +641,7 @@
             🔒 <span><strong>Anonymous</strong> — peer scores are averaged. No individual response is visible.</span>
           </div>
           {loading ? (
-            <div style={{ textAlign:"center", padding:60, color:"#3a5a54" }}>☁️ Loading from shared cloud…</div>
+            <div style={{ textAlign:"center", padding:60, color:"#9ab5af" }}>☁️ Loading from shared cloud…</div>
           ) : (
             <>
               <div style={{ background:`linear-gradient(135deg,${person.color}10,#0d1e1c)`, border:`1px solid ${person.color}30`, borderRadius:20, padding:22, marginBottom:16 }}>
@@ -578,7 +649,7 @@
                   <div style={{ width:56, height:56, borderRadius:"50%", background:`linear-gradient(135deg,${person.color},${person.color}55)`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:15, fontWeight:800, color:"#fff", flexShrink:0 }}>{person.avatar}</div>
                   <div style={{ flex:1, minWidth:0 }}>
                     <h2 style={{ margin:"0 0 3px", fontSize:20, fontWeight:800, color:"#fff" }}>{person.name}</h2>
-                    <div style={{ color:"#3a5a54", fontSize:12 }}>{person.role}</div>
+                    <div style={{ color:"#9ab5af", fontSize:12 }}>{person.role}</div>
                   </div>
                   <div style={{ textAlign:"center" }}>
                     <div style={{ fontSize:36, fontWeight:900, color:person.color, lineHeight:1 }}>{overall}</div>
@@ -651,18 +722,18 @@
             <div style={{ width:42, height:42, borderRadius:"50%", background:`linear-gradient(135deg,${person.color}88,${person.color}33)`, display:"flex", alignItems:"center", justifyContent:"center", fontSize:12, fontWeight:800, color:person.color, border:`2px solid ${person.color}44`, flexShrink:0 }}>{person.avatar}</div>
             <div style={{ flex:1, minWidth:0 }}>
               <div style={{ fontWeight:700, fontSize:13, color:"#fff", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{person.name}</div>
-              <div style={{ fontSize:11, color:"#2a5050", marginTop:2, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{person.role}</div>
+              <div style={{ fontSize:11, color:"#b8cfca", marginTop:2, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>{person.role}</div>
             </div>
             <div style={{ textAlign:"right", flexShrink:0 }}>
               <div style={{ fontSize:20, fontWeight:800, color:overall?person.color:"#2a4040" }}>{overall??"—"}</div>
-              <div style={{ fontSize:9, color:"#1a3530" }}>/ 5.0</div>
+              <div style={{ fontSize:9, color:"#9ab5af" }}>/ 5.0</div>
             </div>
           </div>
           <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:6, marginTop:11 }}>
             {[["🟡 Self",data?.selfAvg,"#F9A825"],["🔵 Peers",data?.peersAvg,"#54A0FF"]].map(([l,v,c])=>(
               <div key={l} style={{ background:"#0a1412", borderRadius:7, padding:"5px 0", textAlign:"center" }}>
                 <div style={{ fontSize:13, fontWeight:700, color:v!==null?c:"#1a3530" }}>{v??"—"}</div>
-                <div style={{ fontSize:10, color:"#1a3530", marginTop:1 }}>{l}</div>
+                <div style={{ fontSize:10, color:"#9ab5af", marginTop:1 }}>{l}</div>
               </div>
             ))}
           </div>
@@ -671,7 +742,7 @@
               {gap>0.5?`⚠ Self +${gap} above peers`:gap<-0.5?`✨ Peers +${Math.abs(gap)} above self`:"✓ Self & peers aligned"}
             </span>
           </div>}
-          {data&&data.selfAvg===null&&data.peersAvg===null&&<div style={{ marginTop:8, textAlign:"center", fontSize:10, color:"#1a3530" }}>No feedback yet</div>}
+          {data&&data.selfAvg===null&&data.peersAvg===null&&<div style={{ marginTop:8, textAlign:"center", fontSize:10, color:"#9ab5af" }}>No feedback yet</div>}
         </div>
       );
     }
@@ -724,8 +795,8 @@
                         </div>
                         <div style={{ flex:1, minWidth:0 }}>
                           <div style={{ fontSize:13, fontWeight:700, color:"#fff", marginBottom:3, lineHeight:1.4 }}>{v.title}</div>
-                          <div style={{ fontSize:11, color:"#2a5050" }}>{v.source} · {v.duration}</div>
-                          <div style={{ fontSize:11, color:"#1a4040", marginTop:4, lineHeight:1.5 }}>{v.desc}</div>
+                          <div style={{ fontSize:11, color:"#b8cfca" }}>{v.source} · {v.duration}</div>
+                          <div style={{ fontSize:11, color:"#a8c3be", marginTop:4, lineHeight:1.5 }}>{v.desc}</div>
                         </div>
                         <span style={{ color:activeVideo===v.id?TEAL:"#2a5050", fontSize:14, flexShrink:0, marginTop:2 }}>{activeVideo===v.id?"▲":"▼"}</span>
                       </div>
@@ -748,18 +819,305 @@
                       style={{ background:"#0a1714", border:"1px solid #1a3530", borderRadius:12, padding:"12px 14px", textDecoration:"none", display:"flex", gap:10, alignItems:"flex-start", transition:"border-color 0.15s" }}>
                       <div style={{ flex:1 }}>
                         <div style={{ fontSize:13, fontWeight:700, color:"#fff", marginBottom:3, lineHeight:1.4 }}>{a.title}</div>
-                        <div style={{ fontSize:11, color:"#2a5050", marginBottom:4 }}>{a.source}</div>
-                        <div style={{ fontSize:11, color:"#1a4040", lineHeight:1.5 }}>{a.desc}</div>
+                        <div style={{ fontSize:11, color:"#b8cfca", marginBottom:4 }}>{a.source}</div>
+                        <div style={{ fontSize:11, color:"#a8c3be", lineHeight:1.5 }}>{a.desc}</div>
                       </div>
                       <div style={{ display:"flex", flexDirection:"column", alignItems:"flex-end", gap:6, flexShrink:0 }}>
                         <span style={{ fontSize:9, background:"#54A0FF22", color:"#54A0FF", border:"1px solid #54A0FF33", borderRadius:5, padding:"2px 7px", fontWeight:700 }}>{a.tag}</span>
-                        <span style={{ color:"#2a5050", fontSize:16 }}>↗</span>
+                        <span style={{ color:"#b8cfca", fontSize:16 }}>↗</span>
                       </div>
                     </a>
                   ))}
                 </div>
               </div>
             </div>
+          )}
+        </div>
+      );
+    }
+
+    // ─── Team Assessment (Five Dysfunctions) ────────────────
+    function TeamAssessment({ onBack, onAdmin }) {
+      const [step, setStep]         = useState(1); // 1 = pick name, 2 = questions, 3 = done
+      const [reviewerId, setReviewerId] = useState(null);
+      const [answers, setAnswers]   = useState({}); // {1: 3, 2: 2, ...}
+      const [saving, setSaving]     = useState(false);
+      const [existing, setExisting] = useState(null);
+      const m = useMobile();
+
+      const person = TEAM.find(p => p.id === reviewerId);
+
+      useEffect(() => {
+        if (reviewerId) {
+          loadMyDysfunction(reviewerId).then(prev => {
+            if (prev) { setExisting(prev); setAnswers(prev.answers || {}); }
+            else { setExisting(null); setAnswers({}); }
+          });
+        }
+      }, [reviewerId]);
+
+      function setAnswer(qid, val) { setAnswers(a => ({ ...a, [qid]: val })); }
+      const answered = DYSFUNCTION_STATEMENTS.filter(q => answers[q.id]).length;
+      const allAnswered = answered === DYSFUNCTION_STATEMENTS.length;
+
+      async function submit() {
+        if (!allAnswered) return;
+        setSaving(true);
+        const ok = await saveDysfunctionSubmission(reviewerId, answers);
+        setSaving(false);
+        if (ok) setStep(3);
+      }
+
+      // ── Step 1: identify yourself ──
+      if (step === 1) {
+        return (
+          <div>
+            <button onClick={onBack} style={{ background:"transparent", border:"none", color:"#9ab5af", fontSize:13, cursor:"pointer", marginBottom:14, padding:"8px 0" }}>← Back</button>
+            <div style={{ background:"#0f2320", border:"1px solid #1a3530", borderRadius:20, padding:m?18:26 }}>
+              <div style={{ fontSize:11, color:TEAL, fontWeight:800, letterSpacing:1.2, textTransform:"uppercase", marginBottom:6 }}>Team Health Check</div>
+              <h2 style={{ color:"#fff", margin:"0 0 6px", fontSize:m?20:24, fontWeight:800 }}>The Five Dysfunctions of a Team</h2>
+              <p style={{ color:"#b8cfca", fontSize:13, margin:"0 0 18px", lineHeight:1.6 }}>A 15-statement assessment of our team based on Patrick Lencioni's framework. Please be honest — the goal is to surface what we can improve together.</p>
+              <div style={{ fontSize:12, color:"#9ab5af", fontWeight:700, marginBottom:10 }}>Who are you?</div>
+              <div style={{ display:"grid", gridTemplateColumns:m?"repeat(2,1fr)":"repeat(3,1fr)", gap:8 }}>
+                {TEAM.map(p => (
+                  <button key={p.id} onClick={()=>{ setReviewerId(p.id); setStep(2); }}
+                    style={{ background:"#0a1714", border:"1px solid #1a3530", borderRadius:12, padding:m?"11px 8px":"13px 10px", cursor:"pointer", textAlign:"left", minHeight:56 }}>
+                    <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+                      <div style={{ width:32, height:32, borderRadius:"50%", background:p.color, color:"#fff", fontSize:12, fontWeight:800, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>{p.avatar}</div>
+                      <div style={{ minWidth:0 }}>
+                        <div style={{ color:"#fff", fontSize:13, fontWeight:700, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{p.name}</div>
+                        <div style={{ color:"#7a9994", fontSize:10, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{p.role}</div>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+              <div style={{ marginTop:18, padding:"10px 14px", background:"#0a1714", borderRadius:10, fontSize:12, color:"#9ab5af" }}>
+                You'll rate the whole team on 15 statements. No need to pick a colleague — this is about us as a team.
+              </div>
+              <div style={{ marginTop:14, textAlign:"center" }}>
+                <button onClick={onAdmin} style={{ background:"transparent", border:"1px solid #1a3530", borderRadius:10, color:"#9ab5af", fontSize:12, cursor:"pointer", padding:"8px 14px" }}>🔐 Admin view</button>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      // ── Step 3: done ──
+      if (step === 3) {
+        return (
+          <div style={{ textAlign:"center", padding:m?"30px 10px":"50px 20px" }}>
+            <div style={{ fontSize:64, marginBottom:16 }}>✅</div>
+            <h2 style={{ color:"#fff", fontSize:m?22:28, fontWeight:800, margin:"0 0 10px" }}>Thank you, {person?.name.split(" ")[0]}!</h2>
+            <p style={{ color:"#b8cfca", fontSize:14, lineHeight:1.6, maxWidth:480, margin:"0 auto 24px" }}>
+              Your team health check has been recorded. Once everyone submits, the admin view will show where we are strong and where we need to work.
+            </p>
+            <button onClick={onBack} style={{ background:TEAL, border:"none", borderRadius:11, color:"#fff", fontSize:14, fontWeight:700, padding:"12px 24px", cursor:"pointer" }}>Back to home</button>
+          </div>
+        );
+      }
+
+      // ── Step 2: questionnaire ──
+      const scaleLabels = { 1:"Rarely", 2:"Sometimes", 3:"Usually" };
+      return (
+        <div>
+          <button onClick={()=>setStep(1)} style={{ background:"transparent", border:"none", color:"#9ab5af", fontSize:13, cursor:"pointer", marginBottom:14, padding:"8px 0" }}>← Change person</button>
+          <div style={{ background:"#0f2320", border:"1px solid #1a3530", borderRadius:20, padding:m?16:24, marginBottom:16 }}>
+            <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:6 }}>
+              <div style={{ width:40, height:40, borderRadius:"50%", background:person.color, color:"#fff", fontSize:13, fontWeight:800, display:"flex", alignItems:"center", justifyContent:"center" }}>{person.avatar}</div>
+              <div>
+                <div style={{ color:"#fff", fontSize:15, fontWeight:800 }}>{person.name}</div>
+                <div style={{ color:"#9ab5af", fontSize:11 }}>Rating the team</div>
+              </div>
+            </div>
+            {existing && (
+              <div style={{ padding:"8px 12px", background:"#1a3530", borderRadius:8, fontSize:12, color:"#b8cfca", marginTop:8 }}>
+                You submitted on {new Date(existing.submittedAt).toLocaleDateString()} — changes will overwrite.
+              </div>
+            )}
+            <div style={{ marginTop:14, display:"flex", alignItems:"center", gap:10 }}>
+              <div style={{ flex:1, height:6, background:"#0a1714", borderRadius:3, overflow:"hidden" }}>
+                <div style={{ width:`${(answered/15)*100}%`, height:"100%", background:TEAL, transition:"width 0.2s" }}/>
+              </div>
+              <div style={{ fontSize:12, color:"#9ab5af", fontWeight:700, minWidth:48, textAlign:"right" }}>{answered} / 15</div>
+            </div>
+          </div>
+
+          <div style={{ padding:"12px 14px", background:"#0f2320", border:"1px solid #1a3530", borderRadius:12, marginBottom:14, fontSize:12, color:"#b8cfca", lineHeight:1.6 }}>
+            <strong style={{ color:"#fff" }}>How to rate:</strong> <span style={{ color:"#EF4444" }}>1 = Rarely</span> · <span style={{ color:"#EAB308" }}>2 = Sometimes</span> · <span style={{ color:"#16A34A" }}>3 = Usually</span>
+          </div>
+
+          {DYSFUNCTION_STATEMENTS.map(q => {
+            const v = answers[q.id] || 0;
+            return (
+              <div key={q.id} style={{ background:"#0f2320", border:`1px solid ${v?TEAL+"55":"#1a3530"}`, borderRadius:14, padding:m?14:18, marginBottom:10 }}>
+                <div style={{ display:"flex", gap:10, marginBottom:12 }}>
+                  <div style={{ width:28, height:28, borderRadius:"50%", background:v?TEAL:"#1a3530", color:"#fff", fontSize:13, fontWeight:800, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>{q.id}</div>
+                  <div style={{ color:"#fff", fontSize:14, lineHeight:1.55, fontWeight:500 }}>{q.text}</div>
+                </div>
+                <div style={{ display:"flex", gap:m?6:10, marginLeft:m?0:38 }}>
+                  {[1,2,3].map(n => {
+                    const sel = v===n;
+                    const color = n===1 ? "#EF4444" : n===2 ? "#EAB308" : "#16A34A";
+                    return (
+                      <button key={n} onClick={()=>setAnswer(q.id, n)}
+                        style={{ flex:1, padding:m?"10px 6px":"11px 10px", background:sel?color+"22":"#0a1714", border:`1.5px solid ${sel?color:"#9ab5af"}`, borderRadius:10, cursor:"pointer", transition:"all 0.15s", minHeight:48 }}>
+                        <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:8 }}>
+                          <div style={{ width:16, height:16, borderRadius:"50%", border:`2px solid ${sel?color:"#9ab5af"}`, display:"flex", alignItems:"center", justifyContent:"center" }}>
+                            {sel && <div style={{ width:8, height:8, borderRadius:"50%", background:color }}/>}
+                          </div>
+                          <div style={{ color:sel?color:"#b8cfca", fontSize:m?12:13, fontWeight:700 }}>{n} · {scaleLabels[n]}</div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+
+          <div style={{ marginTop:20, display:"flex", gap:10 }}>
+            <button onClick={submit} disabled={!allAnswered||saving}
+              style={{ flex:1, padding:"14px 20px", background:allAnswered?TEAL:"#1a3530", border:"none", borderRadius:11, color:"#fff", fontSize:14, fontWeight:800, cursor:allAnswered?"pointer":"not-allowed", minHeight:48 }}>
+              {saving?"Saving…":allAnswered?(existing?"Update submission":"Submit assessment"):`Answer all 15 (${15-answered} left)`}
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    // ─── Team Assessment Admin View ─────────────────────────
+    function TeamAssessmentAdmin({ onBack }) {
+      const [authed, setAuthed] = useState(false);
+      const [code, setCode]     = useState("");
+      const [data, setData]     = useState({});
+      const [loading, setLoading] = useState(false);
+      const m = useMobile();
+
+      useEffect(() => {
+        if (authed) {
+          setLoading(true);
+          dfRead().then(d => { setData(d||{}); setLoading(false); });
+        }
+      }, [authed]);
+
+      if (!authed) {
+        return (
+          <div>
+            <button onClick={onBack} style={{ background:"transparent", border:"none", color:"#9ab5af", fontSize:13, cursor:"pointer", marginBottom:14, padding:"8px 0" }}>← Back</button>
+            <div style={{ background:"#0f2320", border:"1px solid #1a3530", borderRadius:20, padding:m?20:30, maxWidth:420, margin:"30px auto" }}>
+              <div style={{ fontSize:40, textAlign:"center", marginBottom:10 }}>🔐</div>
+              <h2 style={{ color:"#fff", fontSize:20, fontWeight:800, margin:"0 0 6px", textAlign:"center" }}>Admin access</h2>
+              <p style={{ color:"#9ab5af", fontSize:13, textAlign:"center", margin:"0 0 18px" }}>Enter the admin code to view aggregate team results.</p>
+              <input type="password" value={code} onChange={e=>setCode(e.target.value)}
+                onKeyDown={e=>{ if(e.key==="Enter" && code==="inprime2026") setAuthed(true); }}
+                placeholder="Admin code"
+                style={{ width:"100%", padding:"12px 14px", background:"#0a1714", border:"1px solid #1a3530", borderRadius:10, color:"#fff", fontSize:14, outline:"none", marginBottom:12 }}/>
+              <button onClick={()=>{ if(code==="inprime2026") setAuthed(true); }}
+                style={{ width:"100%", padding:"12px 16px", background:TEAL, border:"none", borderRadius:10, color:"#fff", fontSize:14, fontWeight:700, cursor:"pointer" }}>Unlock</button>
+            </div>
+          </div>
+        );
+      }
+
+      const submissions = Object.entries(data).map(([id, v]) => ({ id:Number(id), ...v }));
+      const N = submissions.length;
+
+      // For each dysfunction, compute the average total (sum of its 3 questions) across respondents
+      const results = DYSFUNCTIONS.map(d => {
+        if (!N) return { ...d, avgTotal:0, band:null, perQuestion:[] };
+        let sum = 0;
+        submissions.forEach(s => { d.questions.forEach(q => { sum += (s.answers?.[q] || 0); }); });
+        const avgTotal = +(sum / N).toFixed(1);
+        const band = classifyDysfunction(avgTotal);
+        const perQuestion = d.questions.map(q => {
+          const qs = submissions.map(s => s.answers?.[q] || 0).filter(v => v>0);
+          const avg = qs.length ? +(qs.reduce((a,b)=>a+b,0)/qs.length).toFixed(2) : 0;
+          const st = DYSFUNCTION_STATEMENTS.find(x => x.id===q);
+          return { q, avg, text: st?.text || "" };
+        });
+        return { ...d, avgTotal, band, perQuestion };
+      });
+
+      const submittedIds = new Set(submissions.map(s => s.id));
+      const pending = TEAM.filter(p => !submittedIds.has(p.id));
+
+      return (
+        <div>
+          <button onClick={onBack} style={{ background:"transparent", border:"none", color:"#9ab5af", fontSize:13, cursor:"pointer", marginBottom:14, padding:"8px 0" }}>← Back</button>
+
+          <div style={{ background:"#0f2320", border:"1px solid #1a3530", borderRadius:20, padding:m?16:22, marginBottom:16 }}>
+            <div style={{ fontSize:11, color:TEAL, fontWeight:800, letterSpacing:1.2, textTransform:"uppercase", marginBottom:6 }}>Admin · Team Health</div>
+            <h2 style={{ color:"#fff", fontSize:m?20:24, fontWeight:800, margin:"0 0 14px" }}>Five Dysfunctions — Aggregate Results</h2>
+            <div style={{ display:"grid", gridTemplateColumns:m?"1fr 1fr":"1fr 1fr 1fr", gap:10 }}>
+              <div style={{ background:"#0a1714", borderRadius:10, padding:"10px 12px" }}>
+                <div style={{ color:"#9ab5af", fontSize:11, fontWeight:700, textTransform:"uppercase", letterSpacing:0.8 }}>Responses</div>
+                <div style={{ color:"#fff", fontSize:22, fontWeight:800, marginTop:2 }}>{N} / {TEAM.length}</div>
+              </div>
+              <div style={{ background:"#0a1714", borderRadius:10, padding:"10px 12px" }}>
+                <div style={{ color:"#9ab5af", fontSize:11, fontWeight:700, textTransform:"uppercase", letterSpacing:0.8 }}>Completion</div>
+                <div style={{ color:"#fff", fontSize:22, fontWeight:800, marginTop:2 }}>{TEAM.length ? Math.round(N/TEAM.length*100) : 0}%</div>
+              </div>
+              <div style={{ background:"#0a1714", borderRadius:10, padding:"10px 12px", gridColumn:m?"span 2":"auto" }}>
+                <div style={{ color:"#9ab5af", fontSize:11, fontWeight:700, textTransform:"uppercase", letterSpacing:0.8 }}>Pending</div>
+                <div style={{ color:"#fff", fontSize:13, fontWeight:700, marginTop:4, lineHeight:1.5 }}>
+                  {pending.length ? pending.map(p => p.name.split(" ")[0]).join(", ") : "Everyone has responded 🎉"}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {loading && <div style={{ color:"#9ab5af", textAlign:"center", padding:20 }}>Loading…</div>}
+
+          {!loading && N === 0 && (
+            <div style={{ background:"#0f2320", border:"1px solid #1a3530", borderRadius:16, padding:30, textAlign:"center", color:"#b8cfca" }}>
+              No submissions yet. Ask the team to complete the assessment.
+            </div>
+          )}
+
+          {!loading && N > 0 && (
+            <>
+              <div style={{ display:"flex", gap:8, marginBottom:14, flexWrap:"wrap" }}>
+                <div style={{ flex:1, minWidth:140, background:"#052e1a", border:"1px solid #16A34A55", borderRadius:10, padding:"10px 12px" }}>
+                  <div style={{ color:"#16A34A", fontSize:11, fontWeight:800 }}>● 8–9 · Not a problem</div>
+                </div>
+                <div style={{ flex:1, minWidth:140, background:"#332a00", border:"1px solid #EAB30855", borderRadius:10, padding:"10px 12px" }}>
+                  <div style={{ color:"#EAB308", fontSize:11, fontWeight:800 }}>● 6–7 · Could be a problem</div>
+                </div>
+                <div style={{ flex:1, minWidth:140, background:"#3a0e0e", border:"1px solid #EF444455", borderRadius:10, padding:"10px 12px" }}>
+                  <div style={{ color:"#EF4444", fontSize:11, fontWeight:800 }}>● 3–5 · Needs addressing</div>
+                </div>
+              </div>
+
+              {results.map(r => (
+                <div key={r.key} style={{ background:r.band.bg, border:`1px solid ${r.band.color}66`, borderRadius:16, padding:m?14:18, marginBottom:12 }}>
+                  <div style={{ display:"flex", alignItems:"flex-start", gap:12, marginBottom:10 }}>
+                    <div style={{ fontSize:28 }}>{r.icon}</div>
+                    <div style={{ flex:1, minWidth:0 }}>
+                      <div style={{ color:"#fff", fontSize:m?15:17, fontWeight:800 }}>{r.label}</div>
+                      <div style={{ color:"#d1e4df", fontSize:12, marginTop:3, lineHeight:1.55 }}>{r.detail}</div>
+                    </div>
+                    <div style={{ textAlign:"right", flexShrink:0 }}>
+                      <div style={{ color:r.band.color, fontSize:m?22:28, fontWeight:900, lineHeight:1 }}>{r.avgTotal}</div>
+                      <div style={{ color:"#9ab5af", fontSize:10, fontWeight:600, marginTop:2 }}>out of 9</div>
+                    </div>
+                  </div>
+                  <div style={{ display:"inline-block", padding:"4px 10px", background:r.band.color+"22", border:`1px solid ${r.band.color}`, borderRadius:6, fontSize:11, fontWeight:800, color:r.band.color, marginBottom:10 }}>
+                    {r.band.label}
+                  </div>
+                  <div style={{ background:"rgba(0,0,0,0.25)", borderRadius:10, padding:"10px 12px" }}>
+                    <div style={{ fontSize:10, color:"#9ab5af", fontWeight:700, textTransform:"uppercase", letterSpacing:0.8, marginBottom:6 }}>Per-statement average</div>
+                    {r.perQuestion.map(pq => (
+                      <div key={pq.q} style={{ display:"flex", gap:10, alignItems:"center", padding:"6px 0", borderTop:"1px solid #ffffff10" }}>
+                        <div style={{ width:22, height:22, borderRadius:"50%", background:r.band.color+"33", color:r.band.color, fontSize:11, fontWeight:800, display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>{pq.q}</div>
+                        <div style={{ flex:1, color:"#d1e4df", fontSize:12, lineHeight:1.45 }}>{pq.text}</div>
+                        <div style={{ color:r.band.color, fontSize:14, fontWeight:800, flexShrink:0 }}>{pq.avg}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </>
           )}
         </div>
       );
@@ -774,43 +1132,110 @@
       const filtered = TEAM.filter(p => p.name.toLowerCase().includes(search.toLowerCase()) || p.role.toLowerCase().includes(search.toLowerCase()));
       const person = TEAM.find(p => p.id === selected);
       function goHome() { setView("home"); setSelected(null); }
+      const onHome = view === "home";
+
+      // Big landing cards
+      const LANDING = [
+        { key:"assessment", emoji:"🩺", title:"Team Health",         sub:"The Five Dysfunctions — a 15-question team vibe check", color:"#009E8C", accent:"#00C4AE" },
+        { key:"feedback",   emoji:"✍️", title:"360° Feedback",       sub:"See your report · give feedback to a colleague",          color:"#7C4DFF", accent:"#9B70FF" },
+        { key:"resources",  emoji:"📚", title:"Resources",           sub:"10 feedback dimensions · videos · reading list",         color:"#F9A825", accent:"#FFBB3D" },
+      ];
+
       return (
-        <div style={{ minHeight:"100vh", background:"#060f0e", color:"#fff" }}>
-          <div style={{ borderBottom:"1px solid #0d1e1c", padding:m?"10px 14px":"13px 24px", display:"flex", alignItems:"center", justifyContent:"space-between", position:"sticky", top:0, background:"#060f0eee", backdropFilter:"blur(24px)", zIndex:100 }}>
+        <div style={{ minHeight:"100vh", background:"#0a1816", color:"#fff" }}>
+          <div style={{ borderBottom:"1px solid #15302c", padding:m?"10px 14px":"13px 24px", display:"flex", alignItems:"center", justifyContent:"space-between", position:"sticky", top:0, background:"#0a1816ee", backdropFilter:"blur(24px)", zIndex:100 }}>
             <div onClick={goHome} style={{ cursor:"pointer", flexShrink:0 }}>
               <div style={{ transform:m?"scale(0.78)":"scale(1)", transformOrigin:"left center" }}><InPrimeLogo/></div>
             </div>
-            <div style={{ display:"flex", alignItems:"center", gap:m?8:10 }}>
-              {view !== "form" && (
-                <button onClick={()=>setView("form")} style={{ padding:m?"10px 12px":"8px 16px", background:TEAL, border:"none", borderRadius:10, color:"#fff", fontSize:13, fontWeight:700, cursor:"pointer", minHeight:44 }}>
-                  {m?"✏️ Feedback":"✏️ Give Feedback"}
+            <div style={{ display:"flex", alignItems:"center", gap:m?6:10 }}>
+              {!onHome && (
+                <button onClick={goHome} style={{ padding:m?"10px 12px":"8px 14px", background:"transparent", border:"1px solid #2a4a44", borderRadius:10, color:"#d4e8e4", fontSize:m?12:13, fontWeight:700, cursor:"pointer", minHeight:44 }}>
+                  ← Home
                 </button>
               )}
-              {!m && <div style={{ fontSize:10, color:"#1a3530", textAlign:"right" }}><div style={{ color:"#2a4a44" }}>360° Feedback</div><div>Core Team · Q2</div></div>}
+              {!m && onHome && <div style={{ fontSize:10, color:"#8ca9a4", textAlign:"right" }}><div style={{ color:"#b8cfca" }}>Vibe Check</div><div>Core Team · Q2</div></div>}
             </div>
           </div>
-          <div style={{ maxWidth:900, margin:"0 auto", padding:m?"18px 12px":"22px 16px" }}>
-            {view==="form" && <FeedbackForm onBack={goHome}/>}
-            {view==="dashboard" && person && <Dashboard person={person} onBack={goHome} onGiveFeedback={()=>setView("form")}/>}
-            {view==="home" && (
-              <>
-                <div style={{ textAlign:"center", marginBottom:26 }}>
-                  <h1 style={{ fontSize:"clamp(20px,5vw,32px)", fontWeight:900, margin:0, letterSpacing:"-0.5px" }}>Core Team <span style={{ color:TEAL }}>360° Feedback</span></h1>
-                  <p style={{ color:"#2a5050", marginTop:8, fontSize:14 }}>Tap your name to see your report · Tap <strong style={{ color:TEAL }}>"Give Feedback"</strong> to review a colleague</p>
-                  <div style={{ display:"inline-flex", alignItems:"center", gap:6, marginTop:8, background:"#0a1714", border:`1px solid ${TEAL}22`, borderRadius:20, padding:"6px 14px", fontSize:12, color:TEAL }}>
-                    🔒 Anonymous · Self vs Peers · 10 InPrime-specific dimensions
-                  </div>
+          <div style={{ maxWidth:900, margin:"0 auto", padding:m?"18px 12px":"26px 16px" }}>
+            {view==="form"       && <FeedbackForm onBack={()=>setView("feedback")}/>}
+            {view==="assessment" && <TeamAssessment onBack={goHome} onAdmin={()=>setView("admin")}/>}
+            {view==="admin"      && <TeamAssessmentAdmin onBack={()=>setView("assessment")}/>}
+            {view==="dashboard" && person && <Dashboard person={person} onBack={()=>setView("feedback")} onGiveFeedback={()=>setView("form")}/>}
+
+            {view==="resources" && (
+              <div>
+                <div style={{ marginBottom:18 }}>
+                  <div style={{ fontSize:11, color:"#F9A825", fontWeight:800, letterSpacing:1.2, textTransform:"uppercase", marginBottom:4 }}>📚 Resources</div>
+                  <h1 style={{ fontSize:"clamp(20px,4.5vw,28px)", fontWeight:900, margin:0, letterSpacing:"-0.3px" }}>Context & References</h1>
+                  <p style={{ color:"#b8cfca", fontSize:13, marginTop:6, lineHeight:1.55 }}>What each feedback dimension means, plus videos and reading to sharpen your 360° mindset.</p>
                 </div>
-                <div style={{ background:"#0d1e1c", border:"1px solid #0f2520", borderRadius:20, padding:18, marginBottom:20 }}>
-                  <div style={{ fontSize:11, color:"#1a4040", fontWeight:700, letterSpacing:1, textTransform:"uppercase", marginBottom:3 }}>10 Feedback Dimensions</div>
-                  <div style={{ fontSize:12, color:"#1a3530", marginBottom:13 }}>Tap any to read what it means and why it matters</div>
+                <div style={{ background:"#122b28", border:"1px solid #1e403a", borderRadius:20, padding:m?16:20, marginBottom:18 }}>
+                  <div style={{ fontSize:11, color:TEAL, fontWeight:800, letterSpacing:1, textTransform:"uppercase", marginBottom:4 }}>10 Feedback Dimensions</div>
+                  <div style={{ fontSize:12, color:"#b8cfca", marginBottom:14 }}>Tap any to read what it means and why it matters for InPrime.</div>
                   <ParamInfo/>
                 </div>
                 <KnowledgeBase/>
+              </div>
+            )}
+
+            {view==="feedback" && (
+              <div>
+                <div style={{ marginBottom:18 }}>
+                  <div style={{ fontSize:11, color:"#9B70FF", fontWeight:800, letterSpacing:1.2, textTransform:"uppercase", marginBottom:4 }}>✍️ 360° Feedback</div>
+                  <h1 style={{ fontSize:"clamp(20px,4.5vw,28px)", fontWeight:900, margin:0, letterSpacing:"-0.3px" }}>Your Report · Give Feedback</h1>
+                  <p style={{ color:"#b8cfca", fontSize:13, marginTop:6, lineHeight:1.55 }}>Tap your name to see your report · or tap <strong style={{ color:"#9B70FF" }}>"Give Feedback"</strong> to review a colleague.</p>
+                </div>
+                <button onClick={()=>setView("form")} style={{ width:"100%", padding:"14px 18px", background:"#7C4DFF", border:"none", borderRadius:12, color:"#fff", fontSize:15, fontWeight:800, cursor:"pointer", marginBottom:16, minHeight:52 }}>
+                  ✏️ Give Feedback
+                </button>
                 <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search by name or role…"
-                  style={{ width:"100%", background:"#0d1e1c", border:"1px solid #0f2520", borderRadius:11, padding:"11px 15px", color:"#ccc", fontSize:14, marginBottom:14, outline:"none" }}/>
+                  style={{ width:"100%", background:"#122b28", border:"1px solid #1e403a", borderRadius:11, padding:"11px 15px", color:"#e6f0ee", fontSize:14, marginBottom:14, outline:"none" }}/>
                 <div style={{ display:"grid", gridTemplateColumns:m?"repeat(2,1fr)":"repeat(auto-fill,minmax(255px,1fr))", gap:m?8:11 }}>
                   {filtered.map(p => <TeamCard key={p.id} person={p} onClick={()=>{setSelected(p.id);setView("dashboard");}}/>)}
+                </div>
+              </div>
+            )}
+
+            {view==="home" && (
+              <>
+                <div style={{ textAlign:"center", marginBottom:m?24:36, marginTop:m?6:12 }}>
+                  <div style={{ fontSize:11, color:TEAL, fontWeight:800, letterSpacing:1.4, textTransform:"uppercase", marginBottom:8 }}>InPrime · Core Team</div>
+                  <h1 style={{ fontSize:"clamp(28px,7vw,44px)", fontWeight:900, margin:0, letterSpacing:"-0.8px", lineHeight:1.1 }}>
+                    Core Team · <span style={{ color:TEAL }}>Vibe Check</span>
+                  </h1>
+                  <p style={{ color:"#c4dcd7", marginTop:10, fontSize:m?14:15, lineHeight:1.5, maxWidth:560, marginLeft:"auto", marginRight:"auto" }}>
+                    Two lenses on how we're doing — how each of us is showing up individually, and how we're functioning as a team.
+                  </p>
+                </div>
+
+                <div style={{ display:"grid", gridTemplateColumns:m?"1fr":"repeat(3,1fr)", gap:m?12:16, marginBottom:24 }}>
+                  {LANDING.map(c => (
+                    <button key={c.key} onClick={()=>setView(c.key)}
+                      onMouseEnter={e=>{ e.currentTarget.style.transform="translateY(-3px)"; e.currentTarget.style.borderColor=c.accent; }}
+                      onMouseLeave={e=>{ e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.borderColor=c.color+"55"; }}
+                      style={{
+                        background:`linear-gradient(160deg, ${c.color}22 0%, #122b28 75%)`,
+                        border:`1.5px solid ${c.color}55`, borderRadius:20, padding:m?"22px 18px":"28px 22px",
+                        cursor:"pointer", textAlign:"left", transition:"all 0.2s", minHeight:m?140:200,
+                        display:"flex", flexDirection:"column", justifyContent:"space-between", color:"#fff"
+                      }}>
+                      <div style={{ fontSize:m?40:48, lineHeight:1, marginBottom:m?8:14 }}>{c.emoji}</div>
+                      <div>
+                        <div style={{ color:c.accent, fontSize:m?18:21, fontWeight:900, letterSpacing:"-0.3px", marginBottom:6 }}>{c.title}</div>
+                        <div style={{ color:"#d4e8e4", fontSize:m?12:13, lineHeight:1.5 }}>{c.sub}</div>
+                      </div>
+                      <div style={{ marginTop:m?10:16, display:"flex", alignItems:"center", gap:6, color:c.accent, fontSize:12, fontWeight:800 }}>
+                        Open <span style={{ fontSize:14 }}>→</span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+
+                <div style={{ background:"#122b28", border:"1px solid #1e403a", borderRadius:14, padding:m?"12px 14px":"14px 18px", display:"flex", alignItems:"center", gap:10, flexWrap:"wrap" }}>
+                  <div style={{ fontSize:18 }}>🔒</div>
+                  <div style={{ flex:1, minWidth:200, color:"#c4dcd7", fontSize:m?12:13, lineHeight:1.5 }}>
+                    Feedback is anonymous. Team Health is per-person and only aggregate results are shown in the admin view.
+                  </div>
                 </div>
               </>
             )}
